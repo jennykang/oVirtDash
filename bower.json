@@ -1,0 +1,8 @@
+{
+  "name": "oVirtDash",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "~3.3.1"
+  }
+}

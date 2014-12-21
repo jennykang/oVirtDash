@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>oVirt WebDash Sign In</title>
+
+		<link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+
+		<link href="login.css" rel="stylesheet">
+
+	</head>
+
+	<body>
+
+		<div class="container text-center">
+			<img src="images/ovirt.png" class="logo">
+		</div>
+
+		<div class="container">
+			<form class="form-signin" role="form">
+				<h2 class="form-signin-heading">Sign in</h2>
+
+				<label for="inputUsername">Username</label>
+				<input type="text" id="inputUsername" class="form-control" placeholder="Username" autofocus>
+				<label for="inputPassword">Password</label>
+				<input type="password" id="inputPassword" class="form-control" placeholder="Password">
+				<div class="radio-inline">
+					<label class="radio-inline">
+						<input type="radio" name="options" value="admin"selected> Admin
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="options" value="user"> User
+					</label>
+				</div>
+				<button class="btn btn-lg btn-success btn-block" type="submit">Sign in</button>
+			</form>
+		</div>
+
+	</body>
+</html>
