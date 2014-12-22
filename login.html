@@ -7,9 +7,11 @@
 		<title>oVirt WebDash Sign In</title>
 
 		<link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+		<script src="bower_components/jquery/dist/jquery.js"></script>
 
 		<link href="login.css" rel="stylesheet">
 
+		<script src="login.js"></script>
 	</head>
 
 	<body>
@@ -19,22 +21,32 @@
 		</div>
 
 		<div class="container">
+			
 			<form class="form-signin" role="form">
+
+			<div class="alert alert-danger collapse">
+			  <span class="glyphicon glyphicon-exclamation-sign"></span>
+			  <span>Error:</span>
+			  <span class="errorText"></span>
+			</div>
+
 				<h2 class="form-signin-heading">Sign in</h2>
 
 				<label for="inputUsername">Username</label>
 				<input type="text" id="inputUsername" class="form-control" placeholder="Username" autofocus>
 				<label for="inputPassword">Password</label>
 				<input type="password" id="inputPassword" class="form-control" placeholder="Password">
+				<label for="inputEngine">oVirt Engine Host</label>
+				<input type="text" id="inputEngine" class="form-control" placeholder="Host">
 				<div class="radio-inline">
 					<label class="radio-inline">
-						<input type="radio" name="options" value="admin"selected> Admin
+						<input type="radio" name="options" value="admin" checked> Admin
 					</label>
 					<label class="radio-inline">
 						<input type="radio" name="options" value="user"> User
 					</label>
 				</div>
-				<button class="btn btn-lg btn-success btn-block" type="submit">Sign in</button>
+				<button class="btn btn-lg btn-success btn-block" id="submitButton" type="submit">Sign in</button>
 			</form>
 		</div>
 
