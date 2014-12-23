@@ -29,10 +29,27 @@ $(document).ready(function(){
 		}
 
 
-		var apiurl = "http://" + username + "%40internal:" + password + "@" + enginehost + "/ovirt-engine/";
-		
-		//alert(apiurl);
+		var apiurl = "https://" + username + "%40internal:" + password + "@" + enginehost + "/ovirt-engine/";
+		$.ajax({
+			url: apiurl,
+			type: "GET",
+			dataType: "xml",
+
+			success: function(data){
+				$(".alert-success").removeClass("collapse");
+				alert(":)");
+			},
+
+			error: function(data){
+				console.log("Got back error", data);
+				$(".alert-danger").removeClass("collapse");
+				$(".errorText").text(data.statusText);
+				return;
+			}
+		})
+		alert(apiurl);
 	});
 });
+
 
 
