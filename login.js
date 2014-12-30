@@ -50,6 +50,3 @@ $(document).ready(function(){
 		alert(apiurl);
 	});
 });
-
-
-
