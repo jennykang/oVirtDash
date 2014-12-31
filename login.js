@@ -29,11 +29,13 @@ $(document).ready(function(){
 		}
 
 
-		var apiurl = "https://" + username + "%40internal:" + password + "@" + enginehost + "/ovirt-engine/";
+		var apiurl = "http://" + enginehost + "/ovirt-engine/api";
 		$.ajax({
 			url: apiurl,
 			type: "GET",
 			dataType: "xml",
+			username: username,
+			password: password,
 
 			success: function(data){
 				$(".alert-success").removeClass("collapse");
@@ -47,6 +49,5 @@ $(document).ready(function(){
 				return;
 			}
 		})
-		alert(apiurl);
 	});
 });
