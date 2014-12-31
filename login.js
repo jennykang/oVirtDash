@@ -1,4 +1,3 @@
-//http://admin%40internal:jk951229@localhost:8080/ovirt-engine/api
 $(document).ready(function(){
 	var button = $("#submitButton");
 
