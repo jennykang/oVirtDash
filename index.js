@@ -36,6 +36,26 @@ $(document).ready(function(){
         return objOverview;
     };
 
+    var parseDatacenters = function(xml){
+        var xmlDoc= $.parseXML(xml);
+
+        var data_centers = xmlDoc.getElementsByTagName("data_center");
+        
+        var objDatacenters = [];
+
+        for(var i = 0; i < data_centers.length; i++){
+            var objDatacenter = {
+                name: data_centers[i].getElementsByTagName("name")[0].textContent,
+                status: data_centers[i].getElementsByTagName("status")[0].textContent
+            };
+            objDatacenters.push(objDatacenter);
+        };
+        
+   
+
+        return objDatacenters;
+    }
+
 
     var parseCapabilities = function(xml) {
         //TODO
@@ -55,6 +75,12 @@ $(document).ready(function(){
         $("#total").text("total: " + total);
         $("#active").text("active: " + active);
     };
+
+    var displayUIDatacenter = function(objDatacenters){
+        for(var i = 0; i < objDatacenters.length; i++){
+            $(".dropdown-menu").append("<li><a href=\"#\">" + objDatacenters[i].name + "</a></li>");
+        }
+    }
 
     var apiurl = "http://" + enginehost + "/ovirt-engine/api";
     $.ajax({
@@ -80,14 +106,16 @@ $(document).ready(function(){
 
 
 	$.ajax({
-		url: apiurl + "/capabilities",
+		url: apiurl + "/datacenters",
 		type: "GET",
 		dataType: "text",
 		username: username,
 		password: password,
 
 		success: function(data){
-
+            var obj = parseDatacenters(data);
+            displayUIDatacenter(obj);
+            console.log(obj);
 		},
 
 		error: function(data){

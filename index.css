@@ -1,0 +1,15 @@
+body {
+  background-color: white;
+}
+.navbar-brand {
+  margin: 0px;
+  padding: 0px;
+}
+
+.navbar-brand img{
+  height: 100%;
+}
+
+.navmenu{
+  padding-top: 5px;
+}
