@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+  		<link href="index.css" rel="stylesheet">
+
+		<script src="bower_components/jquery/dist/jquery.js"></script>
+		<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+  		<script src="bower_components/react/react.js"></script>		
+  		<script src="bower_components/react-bootstrap/react-bootstrap.js"></script>
+		<script src="cookies.js"></script>
+
+	</head>
+	<body>
+		
+	</body>
+
+	<script>
+		var username = docCookies.getItem("username");
+		var password = docCookies.getItem("password");
+		var enginehost = docCookies.getItem("enginehost");
+
+		if(!username || !password || !enginehost){
+			window.location = "login.html";
+		}
+
+		var apiurl = "http://" + enginehost + "/ovirt-engine/api";
+
+	    var parseDatacenters = function(xml){
+	        var xmlDoc= $.parseXML(xml);
+
+	        var data_centers = xmlDoc.getElementsByTagName("data_center");
+	        
+	        var objDatacenters = [];
+
+	        for(var i = 0; i < data_centers.length; i++){
+	            var objDatacenter = {
+	                name: data_centers[i].getElementsByTagName("name")[0].textContent,
+	                status: data_centers[i].getElementsByTagName("status")[0].textContent
+	            };
+	            objDatacenters.push(objDatacenter);
+	        };
+	        
+	        return objDatacenters;
+    	}
+
+
+		var datacenterComponent = React.createClass({
+
+			render: function() {
+				var panelElems = [];
+				for(var i = 0; i < this.props.data.length; i++){
+					panelElems.push(React.createElement(ReactBootstrap.Panel,{
+						header: this.props.data[i].name
+					}, this.props.data[i].status));
+				}
+
+				return React.createElement("div", null, 
+					React.createElement("h1", null, "available datacenters"), 
+					panelElems
+				);
+			}
+		})
+
+		var navbarComponent =  React.createClass({
+			render: function(){
+				var self = this;
+				return React.createElement(ReactBootstrap.Navbar, {
+						brand: React.createElement("img", {
+							src: "images/ovirt.png"
+						})
+					}, 
+					React.createElement(ReactBootstrap.Nav, {
+						onSelect: function(eventKey){
+							self.props.onView(eventKey);
+						}
+					},
+						React.createElement(ReactBootstrap.NavItem, {
+							eventKey: "datacenters",
+							href: "#"
+						}, "Datacenters"),
+						
+						React.createElement(ReactBootstrap.NavItem, {
+							eventKey:"statistics",
+							href: "#"
+						}, "Statistics")
+
+					)
+				);
+			}
+		})
+
+		var rootComponent = React.createClass({
+			getInitialState: function(){
+				return {
+					waiting: false,
+					view: "datacenters",
+					data: null
+				}
+			},
+
+			getDatacenterData: function(){
+				var self = this;
+
+				$.ajax({
+					url: apiurl + "/datacenters",
+					type: "GET",
+					dataType: "text",
+					username: username,
+					password: password,
+
+					success: function(xml){
+			            var datacenters = parseDatacenters(xml);
+			            self.setState({
+			            	waiting: false,
+			            	view: "datacenters",
+			            	data: datacenters
+			            })
+					},
+
+					error: function(err){
+
+					}
+				}); 
+				setTimeout(function() {
+					self.setState({
+						waiting: true,
+						view: "datacenters",
+						data: null
+					});
+				}, 0)
+			},
+
+			changeView: function(view){
+				alert("changing view")
+
+				this.setState({
+					waiting: false,
+					data: null,
+					view: view
+				});
+			},
+
+			render: function(){
+				var navElement = React.createElement(navbarComponent, {
+					onView: this.changeView
+				});
+
+				if(this.state.waiting){
+					return React.createElement("div", null, 
+						navElement,
+						React.createElement("div", {className: "container"}, 
+							React.createElement("b", null, "loading...")
+						)
+					);
+				}
+				if(this.state.view === "datacenters"){
+					if(this.state.data){
+						return React.createElement("div", null, 
+							navElement,
+							React.createElement("div", 
+								{
+									className: "container"
+								}, 
+								React.createElement(datacenterComponent, {
+									data: this.state.data
+								})
+							)
+						);
+					}
+					else {
+						this.getDatacenterData();
+					}
+				}
+
+				if(this.state.view === "statistics"){
+					return React.createElement("div", null, navElement,
+						React.createElement("h1", null, "Pending statistics")
+					)
+					//TODO
+				}
+
+				return React.createElement("div", null, 
+					navElement
+				);
+
+			}
+		})
+
+		React.render(React.createElement(rootComponent, null), document.body);
+	</script>
+</html>
