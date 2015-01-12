@@ -51,8 +51,6 @@ $(document).ready(function(){
             objDatacenters.push(objDatacenter);
         };
         
-   
-
         return objDatacenters;
     }
 

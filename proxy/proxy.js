@@ -3,21 +3,22 @@ var serveStatic = require('serve-static');
 
 var http = require('http');
 
-if (process.argv.length <= 2) {
+if (process.argv.length != 4) {
 	console.log('The ovirt API host not given. Run this proxy as:');
-	console.log('node proxy.js ovirt_host');
+	console.log('node proxy.js 192.168.0.1 ../');
 
 	return;
 }
 
 var ovirtHost = process.argv[2];
+var staticDir = process.argv[3];
 
-console.log('The proxy server will use ', ovirtHost, ' as the ovirt host');
+console.log('The proxy server will use ', ovirtHost, ' as the ovirt host and ', staticDir, ' to look for html files');
 
 var port = 8888;
 
 var ovirtProxy = httpProxy.createProxyServer();
-var fileServe = serveStatic('../');
+var fileServe = serveStatic(staticDir);
 
 var server = http.createServer(function(req, res) {
 	var url = req.url;
@@ -35,7 +36,7 @@ var server = http.createServer(function(req, res) {
 	}
 
 	fileServe(req, res, function() {
-		console.log('cannot find file:');
+		console.log('cannot find file:', url);
 		res.writeHeader(404);
 		res.end('File not Found!');
 		return;
