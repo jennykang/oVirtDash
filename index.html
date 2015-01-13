@@ -29,6 +29,36 @@
 
 		var apiurl = "http://" + enginehost + "/ovirt-engine/api";
 
+		var parseStatistics = function(xml) {
+
+	        var xmlDoc= $.parseXML(xml);
+
+	        var product_info = xmlDoc.getElementsByTagName("product_info")[0];
+
+	        var summary = xmlDoc.getElementsByTagName("summary")[0];
+	        var vms = summary.getElementsByTagName("vms")[0];
+	        var time = xmlDoc.getElementsByTagName("time")[0];
+
+	        var objStatistics = {
+	            product_info: {
+	                name: product_info.getElementsByTagName("name")[0].textContent,
+	                vendor: product_info.getElementsByTagName("vendor")[0].textContent,
+	                full_version: product_info.getElementsByTagName("full_version")[0].textContent
+	    	    },
+
+	            summary: {
+	                vms: {
+	                    total: parseInt(vms.getElementsByTagName("total")[0].textContent),
+	                    active: parseInt(vms.getElementsByTagName("active")[0].textContent)
+	                },
+	            },
+
+	            time: time.textContent
+	        };
+
+	        return objStatistics;
+	    }	
+
 	    var parseDatacenters = function(xml){
 	        var xmlDoc= $.parseXML(xml);
 
@@ -47,9 +77,34 @@
 	        return objDatacenters;
     	}
 
+		var statisticsComponent = React.createClass({
+			render: function (){
+				return React.createElement("div", null,
+					React.createElement("h1", null, "Pending statistics..."), 
+					React.createElement(ReactBootstrap.Panel, {
+							header: "Product information"
+						},
+						React.createElement("div", null, "Name: " + this.props.data.product_info.name),
+						React.createElement("br", null),
+						React.createElement("div", null, "Vendor: " + this.props.data.product_info.vendor),
+						React.createElement("br", null),
+						React.createElement("div", null, "Version: " + this.props.data.product_info.full_version)
+					),
+
+					React.createElement(ReactBootstrap.Panel, {
+							header: "Summary"
+						},
+						React.createElement("div", null, "Total VMs: " + this.props.data.summary.vms.total),
+						React.createElement("br", null),
+						React.createElement("div", null, "Active VMs: " + this.props.data.summary.vms.active)
+					),
+
+					React.createElement("div", null, "Time: " + this.props.data.time)
+				);
+			}
+		})
 
 		var datacenterComponent = React.createClass({
-
 			render: function() {
 				var panelElems = [];
 				for(var i = 0; i < this.props.data.length; i++){
@@ -78,16 +133,16 @@
 							self.props.onView(eventKey);
 						}
 					},
-						React.createElement(ReactBootstrap.NavItem, {
-							eventKey: "datacenters",
-							href: "#"
-						}, "Datacenters"),
-						
+
 						React.createElement(ReactBootstrap.NavItem, {
 							eventKey:"statistics",
 							href: "#"
-						}, "Statistics")
+						}, "Statistics"),
 
+						React.createElement(ReactBootstrap.NavItem, {
+							eventKey: "datacenters",
+							href: "#"
+						}, "Datacenters")
 					)
 				);
 			}
@@ -97,9 +152,45 @@
 			getInitialState: function(){
 				return {
 					waiting: false,
-					view: "datacenters",
+					view: "statistics",
 					data: null
 				}
+			},
+
+			getStatisticsData: function(){
+				var self = this;
+				$.ajax({
+			        url: apiurl,
+			        type: "GET",
+			        dataType: "text",
+			        username: username,
+			        password: password,
+
+			        success: function(data){
+			            var statistics = parseStatistics(data);
+			            self.setState({
+			            	waiting: false,
+			            	view: "statistics",
+			            	data: statistics
+			            })
+			        },
+
+			        error: function(err){
+			        	self.setState({
+			        		waiting: false,
+			        		view: "error",
+			        		data: err
+			        	})
+			        }
+    			});
+
+				setTimeout(function() {
+					self.setState({
+						waiting: true,
+						view: "statistics",
+						data: null
+					});
+				}, 0)
 			},
 
 			getDatacenterData: function(){
@@ -122,7 +213,11 @@
 					},
 
 					error: function(err){
-
+						self.setState({
+							waiting: false,
+							view: "error",
+							data: err
+						})
 					}
 				}); 
 				setTimeout(function() {
@@ -135,8 +230,6 @@
 			},
 
 			changeView: function(view){
-				alert("changing view")
-
 				this.setState({
 					waiting: false,
 					data: null,
@@ -153,10 +246,15 @@
 					return React.createElement("div", null, 
 						navElement,
 						React.createElement("div", {className: "container"}, 
-							React.createElement("b", null, "loading...")
+							React.createElement("div", null, 
+								React.createElement("span", {
+									className:"glyphicon glyphicon-refresh glyphicon-refresh-animate"
+								}), " Loading..."
+							)
 						)
 					);
 				}
+
 				if(this.state.view === "datacenters"){
 					if(this.state.data){
 						return React.createElement("div", null, 
@@ -174,19 +272,38 @@
 					else {
 						this.getDatacenterData();
 					}
-				}
+				}			
 
 				if(this.state.view === "statistics"){
-					return React.createElement("div", null, navElement,
-						React.createElement("h1", null, "Pending statistics")
-					)
-					//TODO
+					if(this.state.data){
+						return React.createElement("div", null, 
+							navElement,
+							React.createElement("div", {
+								className: "container"
+							}, 
+							React.createElement(statisticsComponent, {
+								data: this.state.data
+							})
+						)
+
+						);
+					}
+
+					else{
+						this.getStatisticsData();
+					}
+				}
+
+				if(this.state.view === "error"){
+					return React.createElement("div", null, 
+						navElement,
+						React.createElement("h1", null, "error: " + this.state.data.message)
+					);
 				}
 
 				return React.createElement("div", null, 
 					navElement
 				);
-
 			}
 		})
 

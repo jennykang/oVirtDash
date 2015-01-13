@@ -56,10 +56,6 @@ $(document).ready(function(){
 				docCookies.setItem("password", password);
 				docCookies.setItem("enginehost", enginehost);
 
-				// set cookies for username, apiurl and password
-				// then redirect to index.html
-
-				alert(":)");
 				window.location = "index.html";
 			},
 
