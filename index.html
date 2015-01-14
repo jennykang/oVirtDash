@@ -151,7 +151,7 @@
 		var rootComponent = React.createClass({
 			getInitialState: function(){
 				return {
-					waiting: false,
+					waiting: false
 					view: "statistics",
 					data: null
 				}
@@ -179,7 +179,9 @@
 			        	self.setState({
 			        		waiting: false,
 			        		view: "error",
-			        		data: err
+			        		data: {
+			        			message: err.statusText
+			        		}
 			        	})
 			        }
     			});
@@ -216,7 +218,9 @@
 						self.setState({
 							waiting: false,
 							view: "error",
-							data: err
+							data: {
+								message: err.statusText
+							}
 						})
 					}
 				}); 
@@ -246,7 +250,7 @@
 					return React.createElement("div", null, 
 						navElement,
 						React.createElement("div", {className: "container"}, 
-							React.createElement("div", null, 
+							React.createElement("h1", null, 
 								React.createElement("span", {
 									className:"glyphicon glyphicon-refresh glyphicon-refresh-animate"
 								}), " Loading..."
