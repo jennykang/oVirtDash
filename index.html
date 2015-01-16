@@ -11,6 +11,7 @@
 		<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
   		<script src="bower_components/react/react.js"></script>		
   		<script src="bower_components/react-bootstrap/react-bootstrap.js"></script>
+  		<script src="ovirt.js"></script>
 		<script src="cookies.js"></script>
 
 	</head>
@@ -28,6 +29,36 @@
 		}
 
 		var apiurl = "http://" + enginehost + "/ovirt-engine/api";
+
+		var parseStatistics = function(xml) {
+
+	        var xmlDoc= $.parseXML(xml);
+
+	        var product_info = xmlDoc.getElementsByTagName("product_info")[0];
+
+	        var summary = xmlDoc.getElementsByTagName("summary")[0];
+	        var vms = summary.getElementsByTagName("vms")[0];
+	        var time = xmlDoc.getElementsByTagName("time")[0];
+
+	        var objStatistics = {
+	            product_info: {
+	                name: product_info.getElementsByTagName("name")[0].textContent,
+	                vendor: product_info.getElementsByTagName("vendor")[0].textContent,
+	                full_version: product_info.getElementsByTagName("full_version")[0].textContent
+	    	    },
+
+	            summary: {
+	                vms: {
+	                    total: parseInt(vms.getElementsByTagName("total")[0].textContent),
+	                    active: parseInt(vms.getElementsByTagName("active")[0].textContent)
+	                },
+	            },
+
+	            time: time.textContent
+	        };
+
+	        return objStatistics;
+	    }	
 
 	    var parseDatacenters = function(xml){
 	        var xmlDoc= $.parseXML(xml);
@@ -47,9 +78,53 @@
 	        return objDatacenters;
     	}
 
+    	var parseNetworks = function(xml){
+	        var xmlDoc= $.parseXML(xml);
+
+	        var networks = xmlDoc.getElementsByTagName("networks");
+	        
+	        var objNetworks = [];
+
+	        for(var i = 0; i < networks.length; i++){
+	            var objNetworks = {
+	                name: networks[i].getElementsByTagName("name")[0].textContent,
+	                description: networks[i].getElementsByTagName("status")[0].textContent,
+	                usage: networks[i].getElementsByTagName("usages")[0].getElementsByTagName("usage")
+	            };
+	            objNetworks.push(objNetworks);
+	        };
+	        
+	        return objNetworks;
+    	}
+
+		var statisticsComponent = React.createClass({
+			render: function (){
+				return React.createElement("div", null,
+					React.createElement("h1", null, "Statistics"), 
+					React.createElement(ReactBootstrap.Panel, {
+							header: "Product information"
+						},
+						React.createElement("div", null, "Name: " + this.props.data.product_info.name),
+						React.createElement("br", null),
+						React.createElement("div", null, "Vendor: " + this.props.data.product_info.vendor),
+						React.createElement("br", null),
+						React.createElement("div", null, "Version: " + this.props.data.product_info.full_version)
+					),
+
+					React.createElement(ReactBootstrap.Panel, {
+							header: "Summary"
+						},
+						React.createElement("div", null, "Total VMs: " + this.props.data.summary.vms.total),
+						React.createElement("br", null),
+						React.createElement("div", null, "Active VMs: " + this.props.data.summary.vms.active)
+					),
+
+					React.createElement("div", null, "Time: " + this.props.data.time)
+				);
+			}
+		})
 
 		var datacenterComponent = React.createClass({
-
 			render: function() {
 				var panelElems = [];
 				for(var i = 0; i < this.props.data.length; i++){
@@ -59,7 +134,7 @@
 				}
 
 				return React.createElement("div", null, 
-					React.createElement("h1", null, "available datacenters"), 
+					React.createElement("h1", null, "Available Datacenters"), 
 					panelElems
 				);
 			}
@@ -78,17 +153,45 @@
 							self.props.onView(eventKey);
 						}
 					},
+
+						React.createElement(ReactBootstrap.NavItem, {
+							eventKey:"statistics",
+							href: "#"
+						}, "Statistics"),
+
 						React.createElement(ReactBootstrap.NavItem, {
 							eventKey: "datacenters",
 							href: "#"
 						}, "Datacenters"),
-						
-						React.createElement(ReactBootstrap.NavItem, {
-							eventKey:"statistics",
-							href: "#"
-						}, "Statistics")
 
-					)
+						React.createElement(ReactBootstrap.NavItem, {
+							eventKey: "storage",
+							href: "#"
+						}, "Storage"),
+
+						React.createElement(ReactBootstrap.NavItem, {
+							eventKey: "networks",
+							href: "#"
+						}, "Networks"),
+
+						React.createElement(ReactBootstrap.NavItem, {
+							eventKey: "clusters",
+							href: "#"
+						}, "Clusters")
+					),
+
+					React.createElement("form", {
+						className:"navbar-form pull-right"
+					}, React.createElement("button", {
+						type: "submit",
+						className: "btn btn-success",
+						onClick: function(ev){
+							alert("hi");
+							window.location = "login.html"
+
+							ev.preventDefault();
+						}
+					}, "Sign out"))
 				);
 			}
 		})
@@ -96,10 +199,61 @@
 		var rootComponent = React.createClass({
 			getInitialState: function(){
 				return {
-					waiting: false,
-					view: "datacenters",
-					data: null
+					loading: {
+						statistics: false,
+						datacenters: false,
+						storage: false,
+						networks: false,
+						clusters: false
+					},	
+					view: "statistics",
+					data: {
+						statistics: null,
+						datacenters: null,
+						storage: null,
+						networks: null,
+						clusters: null,
+						error: null
+					}
 				}
+			},
+
+			getStatisticsData: function(){
+				if(this.state.loading.statistics){
+					return; //statistics already loading so no need to get data again
+				}
+
+				var self = this;
+				$.ajax({
+			        url: apiurl,
+			        type: "GET",
+			        dataType: "text",
+			        username: username,
+			        password: password,
+
+			        success: function(data){
+			            var statistics = parseStatistics(data);
+			            var state = self.state;
+			            state.loading.statistics = false;
+			            state.data.statistics = statistics;
+			            self.setState(state);
+			        },
+
+			        error: function(err){
+			        	var state = self.state;
+			        	state.data.error = {
+			        		message: err.statusText
+			        	}
+			        	state.view = "error";
+			        	self.setState(state);
+			        }
+    			});
+
+				setTimeout(function() {
+					var state =  self.state;
+					state.loading.statistics = true;
+					self.setState(state);
+				}, 0);
 			},
 
 			getDatacenterData: function(){
@@ -114,51 +268,90 @@
 
 					success: function(xml){
 			            var datacenters = parseDatacenters(xml);
-			            self.setState({
-			            	waiting: false,
-			            	view: "datacenters",
-			            	data: datacenters
-			            })
+			            var state = self.state;
+			            state.loading.datacenters = false;
+			            state.data.datacenters = datacenters;
+			            self.setState(state);
 					},
 
 					error: function(err){
-
+						var state = self.state;
+			        	state.data.error = {
+			        		message: err.statusText
+			        	}
+			        	state.view = "error";
+			        	self.setState(state);
 					}
 				}); 
 				setTimeout(function() {
-					self.setState({
-						waiting: true,
-						view: "datacenters",
-						data: null
-					});
+					var state =  self.state;
+					state.loading.datacenters = true;
+					self.setState(state);
+				}, 0)
+			},
+
+			getNetworksData: function(){
+				var self = this;
+
+				$.ajax({
+					url: apiurl + "/networks",
+					type: "GET",
+					dataType: "text",
+					username: username,
+					password: password,
+
+					success: function(xml){
+			            var networks = parseNetworks(xml);
+			            var state = self.state;
+			            state.loading.networks = false;
+			            state.data.networks = networks;
+			            self.setState(state);
+					},
+
+					error: function(err){
+						var state = self.state;
+			        	state.data.error = {
+			        		message: err.statusText
+			        	}
+			        	state.view = "error";
+			        	self.setState(state);
+					}
+				}); 
+				setTimeout(function() {
+					var state =  self.state;
+					state.loading.networks = true;
+					self.setState(state);
 				}, 0)
 			},
 
 			changeView: function(view){
-				alert("changing view")
-
-				this.setState({
-					waiting: false,
-					data: null,
-					view: view
-				});
+				var state = this.state;
+				state.view = view;
+				this.setState(state);
 			},
 
 			render: function(){
 				var navElement = React.createElement(navbarComponent, {
 					onView: this.changeView
 				});
-
-				if(this.state.waiting){
-					return React.createElement("div", null, 
-						navElement,
-						React.createElement("div", {className: "container"}, 
-							React.createElement("b", null, "loading...")
+	
+				var waitingElement = React.createElement("div", null, 
+					navElement,
+					React.createElement("div", {className: "container"}, 
+						React.createElement("h1", null, 
+							React.createElement("span", {
+								className:"glyphicon glyphicon-refresh glyphicon-refresh-animate"
+							}), " Loading..."
 						)
-					);
-				}
+					)
+				);
+
 				if(this.state.view === "datacenters"){
-					if(this.state.data){
+					if(this.state.loading.datacenters){
+						return waitingElement;
+					}
+
+					if(this.state.data.datacenters){
 						return React.createElement("div", null, 
 							navElement,
 							React.createElement("div", 
@@ -166,7 +359,7 @@
 									className: "container"
 								}, 
 								React.createElement(datacenterComponent, {
-									data: this.state.data
+									data: this.state.data.datacenters
 								})
 							)
 						);
@@ -174,19 +367,41 @@
 					else {
 						this.getDatacenterData();
 					}
-				}
+				}			
 
 				if(this.state.view === "statistics"){
-					return React.createElement("div", null, navElement,
-						React.createElement("h1", null, "Pending statistics")
-					)
-					//TODO
+					if(this.state.loading.statistics){
+						return waitingElement;
+					}
+
+					if(this.state.data.statistics){
+						return React.createElement("div", null, 
+							navElement,
+							React.createElement("div", {
+									className: "container"
+								}, 
+								React.createElement(statisticsComponent, {
+									data: this.state.data.statistics
+								})
+							)
+						);
+					}
+
+					else{
+						this.getStatisticsData();
+					}
+				}
+
+				if(this.state.view === "error"){
+					return React.createElement("div", null, 
+						navElement,
+						React.createElement("h1", null, "error: " + this.state.data.error.message)
+					);
 				}
 
 				return React.createElement("div", null, 
 					navElement
 				);
-
 			}
 		})
 
