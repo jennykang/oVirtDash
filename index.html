@@ -70,28 +70,57 @@
 	        for(var i = 0; i < data_centers.length; i++){
 	            var objDatacenter = {
 	                name: data_centers[i].getElementsByTagName("name")[0].textContent,
-	                status: data_centers[i].getElementsByTagName("status")[0].textContent
+	                status: data_centers[i].getElementsByTagName("state")[0].textContent,
+	                compatibilityMajor: data_centers[i].getElementsByTagName("version")[0].getAttribute("major"),
+	                compatibilityMinor: data_centers[i].getElementsByTagName("version")[0].getAttribute("minor")
 	            };
+
+	            var descriptionElement = data_centers[i].getElementsByTagName("description")[0];
+	            if(descriptionElement){
+	            	objDatacenter.description = descriptionElement.textContent;
+	            }
+
 	            objDatacenters.push(objDatacenter);
-	        };
+	        }
 	        
 	        return objDatacenters;
+    	}
+
+    	var praseStorage = function(xml){
+    		var xmlDoc = $.parseXML(xml);
+
+    		var storage_domains = xmlDoc.getElementsByTagName("storage_domain");
+    		objStorages = [];
+
+    		for(var i = 0; i < storage_domains.length; i++){
+    			var objStorage = {
+    				name: storage_domains[i].querySelector("name").textContent,
+	    			type: storage_domains[i].querySelector("type").textContent,
+	    			storageType: storage_domains[i].querySelector("storage type").textContent,
+	    			storageFormat: storage_domains[i].querySelector("storage_format").textContent
+    			}
+
+    			objStorages.push(objStorage);
+    		}
+
+    		return objStorages;
     	}
 
     	var parseNetworks = function(xml){
 	        var xmlDoc= $.parseXML(xml);
 
-	        var networks = xmlDoc.getElementsByTagName("networks");
+	        var network = xmlDoc.getElementsByTagName("network");
 	        
 	        var objNetworks = [];
 
-	        for(var i = 0; i < networks.length; i++){
-	            var objNetworks = {
-	                name: networks[i].getElementsByTagName("name")[0].textContent,
-	                description: networks[i].getElementsByTagName("status")[0].textContent,
-	                usage: networks[i].getElementsByTagName("usages")[0].getElementsByTagName("usage")
+	        for(var i = 0; i < network.length; i++){
+	            var objNetwork = {
+	                name: network[i].getElementsByTagName("name")[0].textContent,
+	                description: network[i].getElementsByTagName("description")[0].textContent,
+	                datacenter: network[i].getElementsByTagName("data_center")[0].getAttribute("id"),
+	                usage: network[i].getElementsByTagName("usage")[0].textContent
 	            };
-	            objNetworks.push(objNetworks);
+	            objNetworks.push(objNetwork);
 	        };
 	        
 	        return objNetworks;
@@ -127,14 +156,67 @@
 		var datacenterComponent = React.createClass({
 			render: function() {
 				var panelElems = [];
+
+
 				for(var i = 0; i < this.props.data.length; i++){
-					panelElems.push(React.createElement(ReactBootstrap.Panel,{
-						header: this.props.data[i].name
-					}, this.props.data[i].status));
+					var panelChildren = [React.createElement("div", null, "Status: " + this.props.data[i].status)];
+					if(this.props.data[i].description){
+						var description = React.createElement("div", null, "Description: " + this.props.data[i].description);
+						panelChildren.push(description);
+					}
+
+					panelChildren.push(React.createElement("div", null, "Compatibility Version: " + this.props.data[i].compatibilityMajor + "." + this.props.data[i].compatibilityMinor))
+
+					var panel = React.createElement(ReactBootstrap.Panel, {
+							header: this.props.data[i].name
+						},
+						panelChildren
+					);
+
+					panelElems.push(panel);
 				}
 
 				return React.createElement("div", null, 
 					React.createElement("h1", null, "Available Datacenters"), 
+					panelElems
+				);
+			}
+		})
+
+		var storageComponent = React.createClass({
+			render: function(){
+				var panelElems = [];
+				for(var i = 0; i < this.props.data.length; i++){
+					panelElems.push(React.createElement(ReactBootstrap.Panel, {
+						header: this.props.data[i].name
+					}, React.createElement("div", null, "Name: " + this.props.data[i].name),
+					React.createElement("div", null, "Type: " + this.props.data[i].type),
+					React.createElement("div", null, "Storage type: " + this.props.data[i].storageType),
+					React.createElement("div", null, "Storage format: " + this.props.data[i].storageFormat)
+					));
+				}
+
+				return React.createElement("div", null,
+					React.createElement("h1", null, "Storage"),
+					panelElems
+				);
+			}
+		})
+
+		var networksComponent = React.createClass({
+			render: function(){
+				var panelElems = [];
+				for(var i = 0; i < this.props.data.length; i++){
+					panelElems.push(React.createElement(ReactBootstrap.Panel, {
+						header: this.props.data[i].name
+					}, React.createElement("div", null, "Description:  " + this.props.data[i].description), 
+					React.createElement("div", null, "Datacenter (ID): " + this.props.data[i].datacenter),
+					React.createElement("div", null, "Usage: " + this.props.data[i].usage)
+					));
+				}
+
+				return React.createElement("div", null,
+					React.createElement("h1", null, "Networks"),
 					panelElems
 				);
 			}
@@ -146,7 +228,19 @@
 				return React.createElement(ReactBootstrap.Navbar, {
 						brand: React.createElement("img", {
 							src: "images/ovirt.png"
-						})
+						}),
+						defaultNavExpanded: true,
+						toggleButton: [
+							React.createElement("span", {
+								className: "sr-only"
+							}, "Toggle Navigation"),
+							React.createElement("span", {
+								className: "icon-bar"
+							}),
+							React.createElement("span", {
+								className: "icon-bar"
+							})
+						]
 					}, 
 					React.createElement(ReactBootstrap.Nav, {
 						onSelect: function(eventKey){
@@ -186,7 +280,6 @@
 						type: "submit",
 						className: "btn btn-success",
 						onClick: function(ev){
-							alert("hi");
 							window.location = "login.html"
 
 							ev.preventDefault();
@@ -283,11 +376,47 @@
 			        	self.setState(state);
 					}
 				}); 
+
 				setTimeout(function() {
 					var state =  self.state;
 					state.loading.datacenters = true;
 					self.setState(state);
 				}, 0)
+			},
+
+			getStorageData: function(){
+				var self = this;
+
+				$.ajax({
+					url: apiurl + "/storagedomains",
+					type: "GET",
+					dataType: "text",
+					username: username,
+					password: password,
+
+					success: function(xml){
+						var storage = praseStorage(xml);
+						var state = self.state;
+						state.loading.storage = false;
+						state.data.storage = storage;
+						self.setState(state);
+					},
+
+					error: function(err){
+						var state = self.state;
+						state.data.error = {
+							message: err.statusText
+						}
+						state.view = "error";
+						self.setState(state);
+					}
+				});
+
+				setTimeout(function(){
+					var state = self.state;
+					state.loading.storage = true;
+					self.setState(state);
+				}, 0);
 			},
 
 			getNetworksData: function(){
@@ -317,6 +446,7 @@
 			        	self.setState(state);
 					}
 				}); 
+
 				setTimeout(function() {
 					var state =  self.state;
 					state.loading.networks = true;
@@ -346,6 +476,29 @@
 					)
 				);
 
+				if(this.state.view === "statistics"){
+					if(this.state.loading.statistics){
+						return waitingElement;
+					}
+
+					if(this.state.data.statistics){
+						return React.createElement("div", null, 
+							navElement,
+							React.createElement("div", {
+									className: "container"
+								}, 
+								React.createElement(statisticsComponent, {
+									data: this.state.data.statistics
+								})
+							)
+						);
+					}
+
+					else{
+						this.getStatisticsData();
+					}
+				}
+
 				if(this.state.view === "datacenters"){
 					if(this.state.loading.datacenters){
 						return waitingElement;
@@ -369,26 +522,49 @@
 					}
 				}			
 
-				if(this.state.view === "statistics"){
-					if(this.state.loading.statistics){
+				if(this.state.view === "storage"){
+					if(this.state.loading.storage){
 						return waitingElement;
 					}
 
-					if(this.state.data.statistics){
-						return React.createElement("div", null, 
+					if(this.state.data.storage){
+						return React.createElement("div", null,
 							navElement,
-							React.createElement("div", {
+							React.createElement("div",{
 									className: "container"
-								}, 
-								React.createElement(statisticsComponent, {
-									data: this.state.data.statistics
+								},
+								React.createElement(storageComponent,{
+									data: this.state.data.storage
 								})
 							)
 						);
 					}
 
 					else{
-						this.getStatisticsData();
+						this.getStorageData();
+					}
+				}
+
+				if(this.state.view === "networks"){
+					if(this.state.loading.networks){
+						return waitingElement;
+					}
+
+					if(this.state.data.networks){
+						return React.createElement("div", null, 
+							navElement,
+							React.createElement("div", {
+									className: "container"
+								}, 
+								React.createElement(networksComponent, {
+									data: this.state.data.networks
+								})
+							)
+						);
+					}
+
+					else{
+						this.getNetworksData();
 					}
 				}
 
