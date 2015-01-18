@@ -33,24 +33,23 @@
 		var parseStatistics = function(xml) {
 
 	        var xmlDoc= $.parseXML(xml);
+	        var product_info = xmlDoc.querySelector("product_info");
 
-	        var product_info = xmlDoc.getElementsByTagName("product_info")[0];
-
-	        var summary = xmlDoc.getElementsByTagName("summary")[0];
-	        var vms = summary.getElementsByTagName("vms")[0];
-	        var time = xmlDoc.getElementsByTagName("time")[0];
+	        var summary = xmlDoc.querySelector("summary");
+	        var vms = summary.querySelector("vms");
+	        var time = xmlDoc.querySelector("time");
 
 	        var objStatistics = {
 	            product_info: {
-	                name: product_info.getElementsByTagName("name")[0].textContent,
-	                vendor: product_info.getElementsByTagName("vendor")[0].textContent,
-	                full_version: product_info.getElementsByTagName("full_version")[0].textContent
+	                name: product_info.querySelector("name").textContent,
+	                vendor: product_info.querySelector("vendor").textContent,
+	                full_version: product_info.querySelector("full_version").textContent
 	    	    },
 
 	            summary: {
 	                vms: {
-	                    total: parseInt(vms.getElementsByTagName("total")[0].textContent),
-	                    active: parseInt(vms.getElementsByTagName("active")[0].textContent)
+	                    total: parseInt(vms.querySelector("total").textContent),
+	                    active: parseInt(vms.querySelector("active").textContent)
 	                },
 	            },
 
@@ -62,20 +61,18 @@
 
 	    var parseDatacenters = function(xml){
 	        var xmlDoc= $.parseXML(xml);
-
-	        var data_centers = xmlDoc.getElementsByTagName("data_center");
-	        
+	        var data_centers = xmlDoc.querySelectorAll("data_center");
 	        var objDatacenters = [];
 
 	        for(var i = 0; i < data_centers.length; i++){
 	            var objDatacenter = {
-	                name: data_centers[i].getElementsByTagName("name")[0].textContent,
-	                status: data_centers[i].getElementsByTagName("state")[0].textContent,
-	                compatibilityMajor: data_centers[i].getElementsByTagName("version")[0].getAttribute("major"),
-	                compatibilityMinor: data_centers[i].getElementsByTagName("version")[0].getAttribute("minor")
+	                name: data_centers[i].querySelector("name").textContent,
+	                status: data_centers[i].querySelector("state").textContent,
+	                compatibilityMajor: data_centers[i].querySelector("version").getAttribute("major"),
+	                compatibilityMinor: data_centers[i].querySelector("version").getAttribute("minor")
 	            };
 
-	            var descriptionElement = data_centers[i].getElementsByTagName("description")[0];
+	            var descriptionElement = data_centers[i].querySelector("description");
 	            if(descriptionElement){
 	            	objDatacenter.description = descriptionElement.textContent;
 	            }
@@ -88,8 +85,7 @@
 
     	var praseStorage = function(xml){
     		var xmlDoc = $.parseXML(xml);
-
-    		var storage_domains = xmlDoc.getElementsByTagName("storage_domain");
+    		var storage_domains = xmlDoc.querySelectorAll("storage_domain");
     		objStorages = [];
 
     		for(var i = 0; i < storage_domains.length; i++){
@@ -108,22 +104,38 @@
 
     	var parseNetworks = function(xml){
 	        var xmlDoc= $.parseXML(xml);
-
-	        var network = xmlDoc.getElementsByTagName("network");
-	        
+	        var network = xmlDoc.querySelectorAll("network");
 	        var objNetworks = [];
 
 	        for(var i = 0; i < network.length; i++){
 	            var objNetwork = {
-	                name: network[i].getElementsByTagName("name")[0].textContent,
-	                description: network[i].getElementsByTagName("description")[0].textContent,
-	                datacenter: network[i].getElementsByTagName("data_center")[0].getAttribute("id"),
-	                usage: network[i].getElementsByTagName("usage")[0].textContent
+	                name: network[i].querySelector("name").textContent,
+	                description: network[i].querySelector("description").textContent,
+	                datacenter: network[i].querySelector("data_center").getAttribute("id"),
+	                usage: network[i].querySelector("usage").textContent
 	            };
 	            objNetworks.push(objNetwork);
-	        };
+	        }
 	        
 	        return objNetworks;
+    	}
+
+    	var parseClusters = function(xml){
+    		var xmlDoc = $.parseXML(xml);
+    		var cluster = xmlDoc.getElementsByTagName("cluster");
+    		var objClusters = [];
+
+    		for(var i = 0; i < cluster.length; i++){
+    			var objCluster = {
+    				name: cluster[i].querySelector("name").textContent,
+    				datacenter: cluster[i].querySelector("data_center").getAttribute("id"),
+    				compatibilityMajor: cluster[i].querySelector("version").getAttribute("major"),
+    				compatibilityMinor: cluster[i].querySelector("version").getAttribute("minor")
+    			};
+    			objClusters.push(objCluster);
+    		}
+
+    		return objClusters;
     	}
 
 		var statisticsComponent = React.createClass({
@@ -217,6 +229,24 @@
 
 				return React.createElement("div", null,
 					React.createElement("h1", null, "Networks"),
+					panelElems
+				);
+			}
+		})
+
+		var clusterComponent = React.createClass({
+			render: function(){
+				var panelElems = [];
+				for(var i = 0; i < this.props.data.length; i++){
+					panelElems.push(React.createElement(ReactBootstrap.Panel,{
+						header: this.props.data[i].name
+					}, React.createElement("div", null, "Datacenter (ID): " + this.props.data[i].datacenter),
+					React.createElement("div", null, "Compatibility version: " + this.props.data[i].compatibilityMajor + "." + this.props.data[i].compatibilityMinor)
+					));
+				}
+
+				return React.createElement("div", null,
+					React.createElement("h1", null, "Clusters"),
 					panelElems
 				);
 			}
@@ -454,6 +484,41 @@
 				}, 0)
 			},
 
+			getClusterData: function(){
+				var self = this;
+
+				$.ajax({
+					url: apiurl + "/clusters",
+					type: "GET",
+					dataType: "text",
+					username:username,
+					password: password,
+
+					success: function(xml){
+						var state = self.state;
+						var clusters = parseClusters(xml);
+						state.loading.clusters = false;
+						state.data.clusters = clusters;
+						self.setState(state);
+					},
+
+					error: function(err){
+						var state = self.state;
+						state.data.error = {
+							message: err.statusText
+						}
+						state.view = "error";
+						self.setState(state);
+					}
+				});
+
+				setTimeout(function(){
+					var state = self.state;
+					state.loading.clusters = true;
+					self.setState(state);
+				}, 0)
+			},
+
 			changeView: function(view){
 				var state = this.state;
 				state.view = view;
@@ -565,6 +630,29 @@
 
 					else{
 						this.getNetworksData();
+					}
+				}
+
+				if(this.state.view === "clusters"){
+					if(this.state.loading.clusters){
+						return waitingElement;
+					}
+
+					if(this.state.data.clusters){
+						return React.createElement("div", null,
+							navElement,
+							React.createElement("div", {
+								className: "container"
+							},
+							React.createElement(clusterComponent,{
+								data: this.state.data.clusters
+							})
+							)	
+						)
+					}
+
+					else{
+						this.getClusterData();
 					}
 				}
 
