@@ -56,7 +56,7 @@ $(document).ready(function(){
 				docCookies.setItem("password", password);
 				docCookies.setItem("enginehost", enginehost);
 
-				window.location = "index.html";
+				window.location = "/index.html";
 			},
 
 			error: function(data){
