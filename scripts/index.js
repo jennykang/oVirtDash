@@ -20,6 +20,9 @@ var rootComponent = React.createClass({
             },  
             view: "statistics",
             data: {
+                details: {
+                    datacenter: null
+                },
                 statistics: null,
                 datacenters: null,
                 storage: null,
@@ -30,7 +33,7 @@ var rootComponent = React.createClass({
         }
     },
 
-    getStatisticsData: function(){
+    getStatistics: function(){
         if(this.state.loading.statistics){
             return; //statistics already loading so no need to get data again
         }
@@ -67,8 +70,31 @@ var rootComponent = React.createClass({
             self.setState(state);
         }, 0);
     },
+    getDatacenterById: function(id) {
+        // returns datacenter or null
+        var datacenters = this.state.data.datacenters;
+        if (datacenters == null) {
+            return null;
+        }
 
-    getDatacenterData: function(){
+        for(var i = 0; i < datacenters.length; i++){
+            if(datacenters[i].id == id){
+                return datacenters[i];
+            }
+        }
+
+        return null;
+    },
+
+    showDatacenterDetails: function(id) {
+        var state = this.state;
+        var datacenter = this.getDatacenterById(id);
+        state.data.details.datacenter = datacenter;
+        state.view = "datacenter-detail";
+        this.setState(state);
+    },
+
+    getDatacenter: function(){
         var self = this;
 
         $.ajax({
@@ -103,7 +129,7 @@ var rootComponent = React.createClass({
         }, 0)
     },
 
-    getStorageData: function(){
+    getStorage: function(){
         var self = this;
 
         $.ajax({
@@ -138,7 +164,7 @@ var rootComponent = React.createClass({
         }, 0);
     },
 
-    getNetworksData: function(){
+    getNetworks: function(){
         var self = this;
 
         $.ajax({
@@ -173,7 +199,7 @@ var rootComponent = React.createClass({
         }, 0)
     },
 
-    getClusterData: function(){
+    getClusters: function(){
         var self = this;
 
         $.ajax({
@@ -215,6 +241,7 @@ var rootComponent = React.createClass({
     },
 
     render: function(){
+        var self = this;
         var navElement = React.createElement(navbarComponent, {
             onView: this.changeView
         });
@@ -249,7 +276,7 @@ var rootComponent = React.createClass({
             }
 
             else{
-                this.getStatisticsData();
+                this.getStatistics();
             }
         }
 
@@ -266,14 +293,29 @@ var rootComponent = React.createClass({
                             className: "container"
                         }, 
                         React.createElement(datacenterComponent, {
-                            data: this.state.data.datacenters
+                            data: this.state.data.datacenters,
+                            onDatacenter: this.showDatacenterDetails
                         })
                     )
                 );
             }
             else {
-                this.getDatacenterData();
+                this.getDatacenter();
             }
+        }
+
+        if(this.state.view === "datacenter-detail"){
+            return React.createElement("div", null, 
+                navElement,
+                React.createElement("div",
+                    {
+                        className: "container"
+                    },
+                    React.createElement(datacenterDetailComponent, {
+                        data: this.state.data.details.datacenter
+                    })
+                )
+            )
         }           
 
         if(this.state.view === "storage"){
@@ -284,7 +326,8 @@ var rootComponent = React.createClass({
             if(this.state.data.storage){
                 return React.createElement("div", null,
                     navElement,
-                    React.createElement("div",{
+                    React.createElement("div", 
+                        {
                             className: "container"
                         },
                         React.createElement(storageComponent,{
@@ -295,7 +338,7 @@ var rootComponent = React.createClass({
             }
 
             else{
-                this.getStorageData();
+                this.getStorage();
             }
         }
 
@@ -307,7 +350,8 @@ var rootComponent = React.createClass({
             if(this.state.data.networks){
                 return React.createElement("div", null, 
                     navElement,
-                    React.createElement("div", {
+                    React.createElement("div", 
+                        {
                             className: "container"
                         }, 
                         React.createElement(networksComponent, {
@@ -318,7 +362,7 @@ var rootComponent = React.createClass({
             }
 
             else{
-                this.getNetworksData();
+                this.getNetworks();
             }
         }
 
@@ -341,7 +385,7 @@ var rootComponent = React.createClass({
             }
 
             else{
-                this.getClusterData();
+                this.getClusters();
             }
         }
 

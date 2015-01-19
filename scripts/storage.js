@@ -23,7 +23,7 @@ var storageComponent = React.createClass({
         for(var i = 0; i < this.props.data.length; i++){
             panelElems.push(React.createElement(ReactBootstrap.Panel, {
                 header: this.props.data[i].name
-            }, React.createElement("div", null, "Name: " + this.props.data[i].name),
+            },
             React.createElement("div", null, "Type: " + this.props.data[i].type),
             React.createElement("div", null, "Storage type: " + this.props.data[i].storageType),
             React.createElement("div", null, "Storage format: " + this.props.data[i].storageFormat)

@@ -6,6 +6,7 @@ var parseDatacenters = function(xml){
     for(var i = 0; i < data_centers.length; i++){
         var objDatacenter = {
             name: data_centers[i].querySelector("name").textContent,
+            id: data_centers[i].getAttribute("id"),
             status: data_centers[i].querySelector("state").textContent,
             compatibilityMajor: data_centers[i].querySelector("version").getAttribute("major"),
             compatibilityMinor: data_centers[i].querySelector("version").getAttribute("minor")
@@ -23,26 +24,44 @@ var parseDatacenters = function(xml){
 }
 
 var datacenterComponent = React.createClass({
+    getDatacenterPanel: function(datacenter) {
+        var self = this;
+
+        var panelChildren = [
+            React.createElement("div", null, "ID: " + datacenter.id),
+            React.createElement("div", null, "Status: " + datacenter.status)
+        ];
+        
+        if(datacenter.description){
+            var description = React.createElement("div", null, "Description: " + datacenter.description);
+            panelChildren.push(description);
+        }
+
+        panelChildren.push(
+            React.createElement("div", null, 
+                "Compatibility Version: " + 
+                datacenter.compatibilityMajor + "." + 
+                datacenter.compatibilityMinor
+            )
+        )
+
+        return React.createElement(ReactBootstrap.Panel, {
+                header: datacenter.name,
+                className: "anchor",
+                onClick: function(){
+                    self.props.onDatacenter(datacenter.id)
+                }
+            },
+            panelChildren
+        );
+    },
+    
     render: function() {
         var panelElems = [];
 
 
         for(var i = 0; i < this.props.data.length; i++){
-            var panelChildren = [React.createElement("div", null, "Status: " + this.props.data[i].status)];
-            if(this.props.data[i].description){
-                var description = React.createElement("div", null, "Description: " + this.props.data[i].description);
-                panelChildren.push(description);
-            }
-
-            panelChildren.push(React.createElement("div", null, "Compatibility Version: " + this.props.data[i].compatibilityMajor + "." + this.props.data[i].compatibilityMinor))
-
-            var panel = React.createElement(ReactBootstrap.Panel, {
-                    header: this.props.data[i].name
-                },
-                panelChildren
-            );
-
-            panelElems.push(panel);
+            panelElems.push(this.getDatacenterPanel(this.props.data[i]));
         }
 
         return React.createElement("div", null, 
