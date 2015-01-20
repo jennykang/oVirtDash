@@ -21,7 +21,9 @@ var rootComponent = React.createClass({
             view: "statistics",
             data: {
                 details: {
-                    datacenter: null
+                    datacenterId: null,
+                    networkId: null,
+                    clusterId: null
                 },
                 statistics: null,
                 datacenters: null,
@@ -70,8 +72,8 @@ var rootComponent = React.createClass({
             self.setState(state);
         }, 0);
     },
+
     getDatacenterById: function(id) {
-        // returns datacenter or null
         var datacenters = this.state.data.datacenters;
         if (datacenters == null) {
             return null;
@@ -83,18 +85,82 @@ var rootComponent = React.createClass({
             }
         }
 
+
         return null;
+    },
+
+    getDatacenterNetworks: function(id){
+        var self = this;
+
+        $.ajax({
+            url: apiurl + "/datacenters/"+ id + "/networks",
+            type: "GET",
+            dataType: "text",
+            username: username,
+            password: password,
+
+            success: function(xml){
+                var networks = parseNetworks(xml);
+                var datacenter = self.getDatacenterById(id);
+                datacenter.networks = networks;
+
+                self.setState(self.state);
+            },
+
+            error: function(err){
+                var state = self.state;
+                state.data.error = {
+                    message: err.statusText
+                }
+                state.view = "error";
+                self.setState(state);
+            }
+        }); 
+    },
+
+    getDatacenterClusters: function(id){
+
+        var self = this;
+
+        $.ajax({
+            url: apiurl + "/datacenters/"+ id + "/clusters",
+            type: "GET",
+            dataType: "text",
+            username: username,
+            password: password,
+
+            success: function(xml){
+                var clusters = parseClusters(xml);
+                var datacenter = self.getDatacenterById(id);
+                datacenter.clusters = clusters;
+
+                self.setState(self.state);
+            },
+
+            error: function(err){
+                var state = self.state;
+                state.data.error = {
+                    message: err.statusText
+                }
+                state.view = "error";
+                self.setState(state);
+            }
+        }); 
     },
 
     showDatacenterDetails: function(id) {
         var state = this.state;
-        var datacenter = this.getDatacenterById(id);
-        state.data.details.datacenter = datacenter;
+
+        state.data.details.datacenterId = id;
+
+        this.getDatacenterClusters(id);
+        this.getDatacenterNetworks(id);
+
         state.view = "datacenter-detail";
         this.setState(state);
     },
 
-    getDatacenter: function(){
+    getDatacenters: function(){
         var self = this;
 
         $.ajax({
@@ -300,11 +366,12 @@ var rootComponent = React.createClass({
                 );
             }
             else {
-                this.getDatacenter();
+                this.getDatacenters();
             }
         }
 
         if(this.state.view === "datacenter-detail"){
+            var datacenter = this.getDatacenterById(this.state.data.details.datacenterId);
             return React.createElement("div", null, 
                 navElement,
                 React.createElement("div",
@@ -312,7 +379,7 @@ var rootComponent = React.createClass({
                         className: "container"
                     },
                     React.createElement(datacenterDetailComponent, {
-                        data: this.state.data.details.datacenter
+                        datacenter: datacenter
                     })
                 )
             )

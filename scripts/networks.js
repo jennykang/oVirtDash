@@ -18,7 +18,12 @@ var parseNetworks = function(xml){
 
 var networksComponent = React.createClass({
     render: function(){
+        if(!this.props.data){
+            return React.createElement(waitingComponent, null);
+        }
+
         var panelElems = [];
+        
         for(var i = 0; i < this.props.data.length; i++){
             panelElems.push(React.createElement(ReactBootstrap.Panel, {
                 header: this.props.data[i].name

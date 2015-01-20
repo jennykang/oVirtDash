@@ -1,20 +1,19 @@
 var datacenterDetailComponent = React.createClass({
-	
 
 	render: function(){
-		var datacenter = this.props.data;
+		var datacenter = this.props.datacenter;
 
-		var panelChildren = [
+		var datacenterPanelChildren = [
             React.createElement("div", null, "ID: " + datacenter.id),
             React.createElement("div", null, "Status: " + datacenter.status)
         ];
         
         if(datacenter.description){
             var description = React.createElement("div", null, "Description: " + datacenter.description);
-            panelChildren.push(description);
+            datacenterPanelChildren.push(description);
         }
 
-        panelChildren.push(
+        datacenterPanelChildren.push(
             React.createElement("div", null, 
                 "Compatibility Version: " + 
                 datacenter.compatibilityMajor + "." + 
@@ -22,10 +21,20 @@ var datacenterDetailComponent = React.createClass({
             )
         );
 
-        return React.createElement(ReactBootstrap.Panel, {
-                header: datacenter.name
-            },
-            panelChildren
-        );
+        return React.createElement("div", null,
+        	React.createElement("h1", null, "Datacenter"),
+  		    React.createElement(ReactBootstrap.Panel, 
+  		    	{
+                	header: datacenter.name 
+            	},
+           		datacenterPanelChildren
+        	),
+       		React.createElement(networksComponent, {
+            	data: datacenter.networks
+        	}),        	
+        	React.createElement(clusterComponent, {
+            	data: datacenter.clusters
+        	})
+        )
 	}
 })

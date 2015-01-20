@@ -9,7 +9,10 @@ var parseDatacenters = function(xml){
             id: data_centers[i].getAttribute("id"),
             status: data_centers[i].querySelector("state").textContent,
             compatibilityMajor: data_centers[i].querySelector("version").getAttribute("major"),
-            compatibilityMinor: data_centers[i].querySelector("version").getAttribute("minor")
+            compatibilityMinor: data_centers[i].querySelector("version").getAttribute("minor"),
+
+            clusters: null,
+            networks: null
         };
 
         var descriptionElement = data_centers[i].querySelector("description");
@@ -26,6 +29,9 @@ var parseDatacenters = function(xml){
 var datacenterComponent = React.createClass({
     getDatacenterPanel: function(datacenter) {
         var self = this;
+        if(!this.props.data){
+            return React.createElement(waitingComponet, null)
+        }
 
         var panelChildren = [
             React.createElement("div", null, "ID: " + datacenter.id),
