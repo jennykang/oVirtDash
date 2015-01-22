@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<data_centers>
+    <data_center href="/ovirt-engine/api/datacenters/00000002-0002-0002-0002-0000000001bb" id="00000002-0002-0002-0002-0000000001bb">
+        <name>Default</name>
+        <description>The default Data Center</description>
+        <link href="/ovirt-engine/api/datacenters/00000002-0002-0002-0002-0000000001bb/storagedomains" rel="storagedomains"/>
+        <link href="/ovirt-engine/api/datacenters/00000002-0002-0002-0002-0000000001bb/clusters" rel="clusters"/>
+        <link href="/ovirt-engine/api/datacenters/00000002-0002-0002-0002-0000000001bb/networks" rel="networks"/>
+        <link href="/ovirt-engine/api/datacenters/00000002-0002-0002-0002-0000000001bb/permissions" rel="permissions"/>
+        <link href="/ovirt-engine/api/datacenters/00000002-0002-0002-0002-0000000001bb/quotas" rel="quotas"/>
+        <link href="/ovirt-engine/api/datacenters/00000002-0002-0002-0002-0000000001bb/iscsibonds" rel="iscsibonds"/>
+        <link href="/ovirt-engine/api/datacenters/00000002-0002-0002-0002-0000000001bb/qoss" rel="qoss"/>
+        <local>false</local>
+        <version major="3" minor="5"/>
+        <supported_versions>
+            <version major="3" minor="5"/>
+        </supported_versions>
+        <status>
+            <state>uninitialized</state>
+        </status>
+    </data_center>
+    <data_center href="/ovirt-engine/api/datacenters/3f6fa753-f7b6-4576-bdb0-7185f825c9e2" id="3f6fa753-f7b6-4576-bdb0-7185f825c9e2">
+        <name>local_datacenter</name>
+        <link href="/ovirt-engine/api/datacenters/3f6fa753-f7b6-4576-bdb0-7185f825c9e2/storagedomains" rel="storagedomains"/>
+        <link href="/ovirt-engine/api/datacenters/3f6fa753-f7b6-4576-bdb0-7185f825c9e2/clusters" rel="clusters"/>
+        <link href="/ovirt-engine/api/datacenters/3f6fa753-f7b6-4576-bdb0-7185f825c9e2/networks" rel="networks"/>
+        <link href="/ovirt-engine/api/datacenters/3f6fa753-f7b6-4576-bdb0-7185f825c9e2/permissions" rel="permissions"/>
+        <link href="/ovirt-engine/api/datacenters/3f6fa753-f7b6-4576-bdb0-7185f825c9e2/quotas" rel="quotas"/>
+        <link href="/ovirt-engine/api/datacenters/3f6fa753-f7b6-4576-bdb0-7185f825c9e2/iscsibonds" rel="iscsibonds"/>
+        <link href="/ovirt-engine/api/datacenters/3f6fa753-f7b6-4576-bdb0-7185f825c9e2/qoss" rel="qoss"/>
+        <local>true</local>
+        <storage_format>v3</storage_format>
+        <version major="3" minor="5"/>
+        <supported_versions>
+            <version major="3" minor="5"/>
+        </supported_versions>
+        <status>
+            <state>up</state>
+        </status>
+    </data_center>
+</data_centers>

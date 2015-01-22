@@ -7,6 +7,7 @@ var parseNetworks = function(xml){
         var objNetwork = {
             name: network[i].querySelector("name").textContent,
             description: network[i].querySelector("description").textContent,
+            id: network[i].getAttribute("id"),
             datacenter: network[i].querySelector("data_center").getAttribute("id"),
             usage: network[i].querySelector("usage").textContent
         };
@@ -28,6 +29,7 @@ var networksComponent = React.createClass({
             panelElems.push(React.createElement(ReactBootstrap.Panel, {
                 header: this.props.data[i].name
             }, React.createElement("div", null, "Description:  " + this.props.data[i].description), 
+            React.createElement("div", null, "ID: " + this.props.data[i].id),
             React.createElement("div", null, "Datacenter (ID): " + this.props.data[i].datacenter),
             React.createElement("div", null, "Usage: " + this.props.data[i].usage)
             ));

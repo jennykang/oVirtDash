@@ -6,6 +6,7 @@ var praseStorage = function(xml){
     for(var i = 0; i < storage_domains.length; i++){
         var objStorage = {
             name: storage_domains[i].querySelector("name").textContent,
+            id: storage_domains[i].getAttribute("id"),
             type: storage_domains[i].querySelector("type").textContent,
             storageType: storage_domains[i].querySelector("storage type").textContent,
             storageFormat: storage_domains[i].querySelector("storage_format").textContent
@@ -24,6 +25,7 @@ var storageComponent = React.createClass({
             panelElems.push(React.createElement(ReactBootstrap.Panel, {
                 header: this.props.data[i].name
             },
+            React.createElement("div", null, "ID: " + this.props.data[i].id),
             React.createElement("div", null, "Type: " + this.props.data[i].type),
             React.createElement("div", null, "Storage type: " + this.props.data[i].storageType),
             React.createElement("div", null, "Storage format: " + this.props.data[i].storageFormat)

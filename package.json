@@ -1,0 +1,15 @@
+{
+  "name": "oVirtDash",
+  "version": "0.0.0",
+  "main": "proxy.js",
+  "dependencies": {
+    "http-proxy": "^1.8.1",
+    "serve-static": "^1.7.1"
+  },
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "grunt": "latest",
+    "grunt-mocha": "^0.4.11",
+    "mocha": "^2.1.0"
+  }
+}

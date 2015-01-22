@@ -1,0 +1,33 @@
+<html>
+	<head>
+  		<meta charset="utf-8">
+    		<title>Mocha Tests</title>
+	  			<link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+	</head>
+	
+	<body>
+	    <div id="mocha"></div>
+	    <script src="../bower_components/jquery/dist/jquery.js"></script>
+		<script src="../node_modules/mocha/mocha.js"></script>
+	    <script src="../node_modules/chai/chai.js"></script>
+	    <script src="../scripts/clusters.js"></script>
+	    <script src="../scripts/datacenters.js"></script>
+	    <script src="../scripts/datacenterdetail.js"></script>
+	    <script src="../scripts/networks.js"></script>
+	    <script src="../scripts/statistics.js"></script>
+	    <script src="../scripts/storage.js"></script>
+
+		<script>
+		    mocha.setup('bdd')
+		    mocha.reporter('html');
+		</script>
+
+	    <script src="tests.js"></script>
+		
+		<script>
+    	if (navigator.userAgent.indexOf('PhantomJS') < 0) {
+		    mocha.run();
+		}
+		</script>
+	</body>
+</html>
