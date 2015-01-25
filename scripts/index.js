@@ -7,10 +7,26 @@ if(!username || !password || !enginehost){
 }
 
 var apiurl = "http://" + enginehost + "/ovirt-engine/api";
+ovirt.api.options.engineBaseUrl = "http://" + enginehost;
 
 var rootComponent = React.createClass({
+    componentDidMount: function(){
+
+        var self = this;
+        var promise = ovirt.api.init();
+        promise.then(function(){
+            self.state.initialized = true;
+            self.setState(self.state);
+        });
+        promise.catch(function(){
+            alert("Cannot connect. Going back to sign in page");
+            window.location = "/login.html";
+        });
+    },
+
     getInitialState: function(){
         return {
+            initialized: false,
             loading: {
                 statistics: false,
                 datacenters: false,
@@ -80,7 +96,7 @@ var rootComponent = React.createClass({
         }
 
         for(var i = 0; i < datacenters.length; i++){
-            if(datacenters[i].id == id){
+            if(datacenters[i].data.id == id){
                 return datacenters[i];
             }
         }
@@ -102,7 +118,7 @@ var rootComponent = React.createClass({
             success: function(xml){
                 var networks = parseNetworks(xml);
                 var datacenter = self.getDatacenterById(id);
-                datacenter.networks = networks;
+                datacenter.data.networks = networks;
 
                 self.setState(self.state);
             },
@@ -132,7 +148,7 @@ var rootComponent = React.createClass({
             success: function(xml){
                 var clusters = parseClusters(xml);
                 var datacenter = self.getDatacenterById(id);
-                datacenter.clusters = clusters;
+                datacenter.data.clusters = clusters;
 
                 self.setState(self.state);
             },
@@ -163,30 +179,18 @@ var rootComponent = React.createClass({
     getDatacenters: function(){
         var self = this;
 
-        $.ajax({
-            url: apiurl + "/datacenters",
-            type: "GET",
-            dataType: "text",
-            username: username,
-            password: password,
-
-            success: function(xml){
-                var datacenters = parseDatacenters(xml);
-                var state = self.state;
-                state.loading.datacenters = false;
-                state.data.datacenters = datacenters;
-                self.setState(state);
-            },
-
-            error: function(err){
-                var state = self.state;
-                state.data.error = {
-                    message: err.statusText
-                }
-                state.view = "error";
-                self.setState(state);
+        ovirt.api.datacenters.list().run().then(function(data){
+            self.state.loading.datacenters = false;
+            self.state.data.datacenters = data;
+            self.setState(self.state);
+        }).catch(function(err){
+            var state = self.state;
+            state.data.error = {
+                message: err.message
             }
-        }); 
+            state.view = "error";
+            self.setState(state);
+        })
 
         setTimeout(function() {
             var state =  self.state;
@@ -268,33 +272,21 @@ var rootComponent = React.createClass({
     getClusters: function(){
         var self = this;
 
-        $.ajax({
-            url: apiurl + "/clusters",
-            type: "GET",
-            dataType: "text",
-            username:username,
-            password: password,
-
-            success: function(xml){
-                var state = self.state;
-                var clusters = parseClusters(xml);
-                state.loading.clusters = false;
-                state.data.clusters = clusters;
-                self.setState(state);
-            },
-
-            error: function(err){
-                var state = self.state;
-                state.data.error = {
-                    message: err.statusText
-                }
-                state.view = "error";
-                self.setState(state);
-            }
-        });
-
-        setTimeout(function(){
+        ovirt.api.clusters.list().run().then(function(data){
+            self.state.loading.clusters = false;
+            self.state.data.clusters = data;
+            self.setState(self.state);
+        }).catch(function(err){
             var state = self.state;
+            state.data.error = {
+                message: err.message
+            }
+            state.view = "error";
+            self.setState(state);
+        })
+
+        setTimeout(function() {
+            var state =  self.state;
             state.loading.clusters = true;
             self.setState(state);
         }, 0)
@@ -312,15 +304,15 @@ var rootComponent = React.createClass({
             onView: this.changeView
         });
 
+        if(!this.state.initialized){
+            return React.createElement("div", {
+                className: "container"
+            }, React.createElement(waitingComponent, null));
+        }
+
         var waitingElement = React.createElement("div", null, 
             navElement,
-            React.createElement("div", {className: "container"}, 
-                React.createElement("h1", null, 
-                    React.createElement("span", {
-                        className:"glyphicon glyphicon-refresh glyphicon-refresh-animate"
-                    }), " Loading..."
-                )
-            )
+            React.createElement(waitingComponent, null)
         );
 
         if(this.state.view === "statistics"){

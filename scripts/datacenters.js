@@ -1,31 +1,3 @@
-var parseDatacenters = function(xml){
-    var xmlDoc= $.parseXML(xml);
-    var data_centers = xmlDoc.querySelectorAll("data_center");
-    var objDatacenters = [];
-
-    for(var i = 0; i < data_centers.length; i++){
-        var objDatacenter = {
-            name: data_centers[i].querySelector("name").textContent,
-            id: data_centers[i].getAttribute("id"),
-            status: data_centers[i].querySelector("state").textContent,
-            compatibilityMajor: data_centers[i].querySelector("version").getAttribute("major"),
-            compatibilityMinor: data_centers[i].querySelector("version").getAttribute("minor"),
-
-            clusters: null,
-            networks: null
-        };
-
-        var descriptionElement = data_centers[i].querySelector("description");
-        if(descriptionElement){
-            objDatacenter.description = descriptionElement.textContent;
-        }
-
-        objDatacenters.push(objDatacenter);
-    }
-    
-    return objDatacenters;
-}
-
 var datacenterComponent = React.createClass({
     getDatacenterPanel: function(datacenter) {
         var self = this;
@@ -34,28 +6,28 @@ var datacenterComponent = React.createClass({
         }
 
         var panelChildren = [
-            React.createElement("div", null, "ID: " + datacenter.id),
-            React.createElement("div", null, "Status: " + datacenter.status)
+            React.createElement("div", null, "ID: " + datacenter.data.id),
+            React.createElement("div", null, "Status: " + datacenter.data.status.state)
         ];
         
-        if(datacenter.description){
-            var description = React.createElement("div", null, "Description: " + datacenter.description);
+        if(datacenter.data.description){
+            var description = React.createElement("div", null, "Description: " + datacenter.data.description);
             panelChildren.push(description);
         }
 
         panelChildren.push(
             React.createElement("div", null, 
                 "Compatibility Version: " + 
-                datacenter.compatibilityMajor + "." + 
-                datacenter.compatibilityMinor
+                datacenter.data.version.major + "." + 
+                datacenter.data.version.minor
             )
         )
 
         return React.createElement(ReactBootstrap.Panel, {
-                header: datacenter.name,
+                header: datacenter.data.name,
                 className: "anchor",
                 onClick: function(){
-                    self.props.onDatacenter(datacenter.id)
+                    self.props.onDatacenter(datacenter.data.id)
                 }
             },
             panelChildren

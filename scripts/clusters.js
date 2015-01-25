@@ -1,41 +1,48 @@
-var parseClusters = function(xml){
-    var xmlDoc = $.parseXML(xml);
-    var cluster = xmlDoc.getElementsByTagName("cluster");
-    var objClusters = [];
-
-    for(var i = 0; i < cluster.length; i++){
-        var objCluster = {
-            name: cluster[i].querySelector("name").textContent,
-            id: cluster[i].getAttribute("id"),
-            datacenter: cluster[i].querySelector("data_center").getAttribute("id"),
-            compatibilityMajor: cluster[i].querySelector("version").getAttribute("major"),
-            compatibilityMinor: cluster[i].querySelector("version").getAttribute("minor")
-        };
-        objClusters.push(objCluster);
-    }
-
-    return objClusters;
-}
-
 var clusterComponent = React.createClass({
-    render: function(){
+    getClusterPanel: function(cluster){
+        var self = this;
         if(!this.props.data){
             return React.createElement(waitingComponent, null);
         }
 
-        var panelElems = [];
+        var panelChildren = [
+            React.createElement("div", null, "ID: " + cluster.data.id)
+        ];
         
-        for(var i = 0; i < this.props.data.length; i++){
-            panelElems.push(React.createElement(ReactBootstrap.Panel,{
-                header: this.props.data[i].name
-            }, React.createElement("div", null, "ID: " + this.props.data[i].id),
-            React.createElement("div", null, "Datacenter (ID): " + this.props.data[i].datacenter),
-            React.createElement("div", null, "Compatibility version: " + this.props.data[i].compatibilityMajor + "." + this.props.data[i].compatibilityMinor)
-            ));
+        if(cluster.data.description){
+            var description = React.createElement("div", null, "Description: " + cluster.data.description);
+            panelChildren.push(description);
         }
 
-        return React.createElement("div", null,
-            React.createElement("h1", null, "Clusters"),
+        panelChildren.push(
+            React.createElement("div", null, 
+                "Compatibility Version: " + 
+                cluster.data.version.major + "." + 
+                cluster.data.version.minor
+            )
+        );
+
+        return React.createElement(ReactBootstrap.Panel, {
+                header: cluster.data.name,
+                className: "anchor",
+                onClick: function(){
+                    self.props.onCluster(cluster.data.id)
+                }
+            },
+            panelChildren
+        );
+    },
+
+    render: function(){
+        var panelElems = [];
+
+
+        for(var i = 0; i < this.props.data.length; i++){
+            panelElems.push(this.getClusterPanel(this.props.data[i]));
+        }
+
+        return React.createElement("div", null, 
+            React.createElement("h1", null, "Clusters"), 
             panelElems
         );
     }
