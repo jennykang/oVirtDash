@@ -51,7 +51,7 @@ var rootComponent = React.createClass({
         }
     },
 
-    getStatistics: function(){
+    getstatistics: function(){
         if(this.state.loading.statistics){
             return; //statistics already loading so no need to get data again
         }
@@ -202,30 +202,18 @@ var rootComponent = React.createClass({
     getStorage: function(){
         var self = this;
 
-        $.ajax({
-            url: apiurl + "/storagedomains",
-            type: "GET",
-            dataType: "text",
-            username: username,
-            password: password,
-
-            success: function(xml){
-                var storage = praseStorage(xml);
-                var state = self.state;
-                state.loading.storage = false;
-                state.data.storage = storage;
-                self.setState(state);
-            },
-
-            error: function(err){
-                var state = self.state;
-                state.data.error = {
-                    message: err.statusText
-                }
-                state.view = "error";
-                self.setState(state);
+        ovirt.api.storagedomains.list().run().then(function(data){
+            self.state.loading.storage = false;
+            self.state.data.storage = data;
+            self.setState(self.state);
+        }).catch(function(err){
+            var state = self.setState;
+            state.data.error = {
+                message: err.message
             }
-        });
+            state.view = "error";
+            self.setState(state);
+        })
 
         setTimeout(function(){
             var state = self.state;
@@ -237,30 +225,18 @@ var rootComponent = React.createClass({
     getNetworks: function(){
         var self = this;
 
-        $.ajax({
-            url: apiurl + "/networks",
-            type: "GET",
-            dataType: "text",
-            username: username,
-            password: password,
-
-            success: function(xml){
-                var networks = parseNetworks(xml);
-                var state = self.state;
-                state.loading.networks = false;
-                state.data.networks = networks;
-                self.setState(state);
-            },
-
-            error: function(err){
-                var state = self.state;
-                state.data.error = {
-                    message: err.statusText
-                }
-                state.view = "error";
-                self.setState(state);
+        ovirt.api.networks.list().run().then(function(data){
+            self.state.loading.networks = false;
+            self.state.data.networks = data;
+            self.setState(self.state);
+        }).catch(function(err){
+            var state = self.state;
+            state.data.error = {
+                message: err.message
             }
-        }); 
+            state.view = "error";
+            self.setState(state);
+        })
 
         setTimeout(function() {
             var state =  self.state;
@@ -334,7 +310,7 @@ var rootComponent = React.createClass({
             }
 
             else{
-                this.getStatistics();
+                this.getstatistics();
             }
         }
 

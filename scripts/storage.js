@@ -1,39 +1,47 @@
-var praseStorage = function(xml){
-    var xmlDoc = $.parseXML(xml);
-    var storage_domains = xmlDoc.querySelectorAll("storage_domain");
-    objStorages = [];
-
-    for(var i = 0; i < storage_domains.length; i++){
-        var objStorage = {
-            name: storage_domains[i].querySelector("name").textContent,
-            id: storage_domains[i].getAttribute("id"),
-            type: storage_domains[i].querySelector("type").textContent,
-            storageType: storage_domains[i].querySelector("storage type").textContent,
-            storageFormat: storage_domains[i].querySelector("storage_format").textContent
+var storageComponent = React.createClass({
+     getStoragePanel: function(storage) {
+        var self = this;
+        if(!this.props.data){
+            return React.createElement(waitingComponet, null)
         }
 
-        objStorages.push(objStorage);
-    }
+        var panelChildren = [
+            React.createElement("div", null, "ID: " + storage.data.id),
+            React.createElement("div", null, "Type: " + storage.data.type),
+            React.createElement("div", null, "Storage type: " + storage.data.storage.type),
+            React.createElement("div", null, "Storage format: " + storage.data.storage_format)
+        ];
+        
+        if(storage.data.available != 0){
+            var total = (storage.data.available + storage.data.used)/(1024*1024*1024);
+            var available = (storage.data.available)/(1024*1024*1024);
+            var totalSpace = React.createElement("div", null, "Total space: " + total + "GB");
+            var availableSpace = React.createElement("div", null, "Available space: " + available + "GB");
+            panelChildren.push(totalSpace)
+            panelChildren.push(availableSpace);
+        }
 
-    return objStorages;
-}
+        return React.createElement(ReactBootstrap.Panel, {
+                header: storage.data.name,
+                className: "anchor",
+                onClick: function(){
+                    self.props.onStorage(storage.data.id)
+                }
+            },
+            panelChildren
+        );
+    },
 
-var storageComponent = React.createClass({
     render: function(){
         var panelElems = [];
+
+
         for(var i = 0; i < this.props.data.length; i++){
-            panelElems.push(React.createElement(ReactBootstrap.Panel, {
-                header: this.props.data[i].name
-            },
-            React.createElement("div", null, "ID: " + this.props.data[i].id),
-            React.createElement("div", null, "Type: " + this.props.data[i].type),
-            React.createElement("div", null, "Storage type: " + this.props.data[i].storageType),
-            React.createElement("div", null, "Storage format: " + this.props.data[i].storageFormat)
-            ));
+            panelElems.push(this.getStoragePanel(this.props.data[i]));
         }
 
-        return React.createElement("div", null,
-            React.createElement("h1", null, "Storage"),
+        return React.createElement("div", null, 
+            React.createElement("h1", null, "Storage domains"), 
             panelElems
         );
     }

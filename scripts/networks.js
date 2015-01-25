@@ -1,42 +1,44 @@
-var parseNetworks = function(xml){
-    var xmlDoc= $.parseXML(xml);
-    var network = xmlDoc.querySelectorAll("network");
-    var objNetworks = [];
-
-    for(var i = 0; i < network.length; i++){
-        var objNetwork = {
-            name: network[i].querySelector("name").textContent,
-            description: network[i].querySelector("description").textContent,
-            id: network[i].getAttribute("id"),
-            datacenter: network[i].querySelector("data_center").getAttribute("id"),
-            usage: network[i].querySelector("usage").textContent
-        };
-        objNetworks.push(objNetwork);
-    }
-    
-    return objNetworks;
-}
-
 var networksComponent = React.createClass({
-    render: function(){
+    getNetworkPanel: function(network){
+        var self = this;
         if(!this.props.data){
             return React.createElement(waitingComponent, null);
         }
 
-        var panelElems = [];
-        
-        for(var i = 0; i < this.props.data.length; i++){
-            panelElems.push(React.createElement(ReactBootstrap.Panel, {
-                header: this.props.data[i].name
-            }, React.createElement("div", null, "Description:  " + this.props.data[i].description), 
-            React.createElement("div", null, "ID: " + this.props.data[i].id),
-            React.createElement("div", null, "Datacenter (ID): " + this.props.data[i].datacenter),
-            React.createElement("div", null, "Usage: " + this.props.data[i].usage)
-            ));
+        var usage = "";
+        if(network.data.usages.usage.length){
+            usage = network.data.usages.usage[0];
+            for(var i = 1; i < network.data.usages.usage.length; i++){
+                usage = usage + "," + network.data.usages.usage[i];
+            }
         }
 
-        return React.createElement("div", null,
-            React.createElement("h1", null, "Networks"),
+
+        var panelChildren = [
+            React.createElement("div", null, "Description: " + network.data.description),
+            React.createElement("div", null, "ID: " + network.data.id),
+            React.createElement("div", null, "Usage: " + usage)
+        ];
+
+        return React.createElement(ReactBootstrap.Panel, {
+                header: network.data.name,
+                className: "anchor",
+                onClick: function(){
+                    self.props.onNetwork(network.data.id)
+                }
+            }, panelChildren
+        );
+    },
+
+    render: function(){
+        var panelElems = [];
+
+        for(var i = 0; i < this.props.data.length; i++){
+            panelElems.push(this.getNetworkPanel(this.props.data[i]));
+        }
+
+        return React.createElement("div", null, 
+            React.createElement("h1", null, "Networks"), 
             panelElems
         );
     }

@@ -14,6 +14,11 @@ var clusterComponent = React.createClass({
             panelChildren.push(description);
         }
 
+        if(cluster.data.cpu){
+            var cpu = React.createElement("div", null, "CPU Type: " + cluster.data.cpu.id);
+            panelChildren.push(cpu);
+        }
+
         panelChildren.push(
             React.createElement("div", null, 
                 "Compatibility Version: " + 
