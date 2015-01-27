@@ -3,7 +3,7 @@ var password = docCookies.getItem("password");
 var enginehost = docCookies.getItem("enginehost");
 
 if(!username || !password || !enginehost){
-    window.location = "/login.html";
+    window.location = "login.html";
 }
 
 var apiurl = "http://" + enginehost + "/ovirt-engine/api";
@@ -20,7 +20,7 @@ var rootComponent = React.createClass({
         });
         promise.catch(function(){
             alert("Cannot connect. Going back to sign in page");
-            window.location = "/login.html";
+            window.location = "login.html";
         });
     },
 
