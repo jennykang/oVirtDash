@@ -32,6 +32,9 @@ var networksComponent = React.createClass({
 
     render: function(){
         var panelElems = [];
+        if(!this.props.data){
+            return React.createElement(waitingComponent, null);
+        }
 
         for(var i = 0; i < this.props.data.length; i++){
             panelElems.push(this.getNetworkPanel(this.props.data[i]));
