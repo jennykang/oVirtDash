@@ -23,9 +23,9 @@ var storageComponent = React.createClass({
 
         return React.createElement(ReactBootstrap.Panel, {
                 header: storage.data.name,
-                className: "anchor",
+                //className: "anchor",
                 onClick: function(){
-                    self.props.onStorage(storage.data.id)
+                    //self.props.onStorage(storage.data.id)
                 }
             },
             panelChildren

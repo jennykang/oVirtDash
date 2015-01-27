@@ -51,7 +51,7 @@ var rootComponent = React.createClass({
         }
     },
 
-    getstatistics: function(){
+    getStatistics: function(){
         if(this.state.loading.statistics){
             return; //statistics already loading so no need to get data again
         }
@@ -199,7 +199,7 @@ var rootComponent = React.createClass({
         }, 0);
     },
 
-    getNetworkById: function(){
+    getNetworkById: function(id){
         var networks = this.state.data.networks;
         if (networks == null) {
             return null;
@@ -214,71 +214,30 @@ var rootComponent = React.createClass({
         return null;
     },
 
-    getNetworkDatacenters: function(){
+    getNetworkDatacenters: function(id){
         var self = this;
 
-        $.ajax({
-            url: apiurl + "/networks/"+ id + "/datacenters",
-            type: "GET",
-            dataType: "text",
-            username: username,
-            password: password,
-
-            success: function(xml){
-                var datacenters = parseDatacenters(xml);
-                var network = self.getNetworkById(id);
-                network.data.datacenters = datacenters;
-
-                self.setState(self.state);
-            },
-
-            error: function(err){
-                var state = self.state;
-                state.data.error = {
-                    message: err.statusText
-                }
-                state.view = "error";
-                self.setState(state);
+        var network = this.getNetworkById(id);
+        network.data_center.list().run().then(function(data){
+            var datacenter = data;
+            network.data.datacenters = datacenters;
+            self.setState(self.state);
+        }).catch(function(err){
+            var state = self.setState;
+            state.data.error = {
+                message: err.message
             }
-        });        
+            state.view = "error";
+            self.setState(state);
+        })
     },
 
-    getNetworkClusters: function(){
-        var self = this;
-
-        $.ajax({
-            url: apiurl + "/networks/"+ id + "/clusters",
-            type: "GET",
-            dataType: "text",
-            username: username,
-            password: password,
-
-            success: function(xml){
-                var clusters = parseClusters(xml);
-                var network = self.getNetworkById(id);
-                network.data.clusters = clusters;
-
-                self.setState(self.state);
-            },
-
-            error: function(err){
-                var state = self.state;
-                state.data.error = {
-                    message: err.statusText
-                }
-                state.view = "error";
-                self.setState(state);
-            }
-        });         
-    },
-
-    showNetworkDetail: function(){
+    showNetworkDetails: function(id){
         var state = this.state;
 
         state.data.details.networkId = id;
 
-        this.getNetworkDatacenters(id);
-        this.getNetworkClusters(id);
+        //this.getNetworkDatacenters(id);
 
         state.view = "network-detail";
         this.setState(state);
@@ -307,7 +266,7 @@ var rootComponent = React.createClass({
         }, 0)
     },
 
-    getClusterById: function(){
+    getClusterById: function(id){
         var clusters = this.state.data.clusters;
         if (clusters == null) {
             return null;
@@ -322,65 +281,44 @@ var rootComponent = React.createClass({
         return null;
     },
 
-    getClusterDatacenters: function(){
+    getClusterDatacenters: function(id){
         var self = this;
 
-        $.ajax({
-            url: apiurl + "/clusters/"+ id + "/datacenters",
-            type: "GET",
-            dataType: "text",
-            username: username,
-            password: password,
-
-            success: function(xml){
-                var datacenters = parseDatacenters(xml);
-                var cluster = self.getClusterById(id);
-                cluster.data.datacenters = datacenters;
-
-                self.setState(self.state);
-            },
-
-            error: function(err){
-                var state = self.state;
-                state.data.error = {
-                    message: err.statusText
-                }
-                state.view = "error";
-                self.setState(state);
+        var cluster = getClusterById(id);
+        console.log(cluster);
+        cluster.data_center.list().run().then(function(data){
+            var datacenter = data;
+            cluster.data.datacenters = datacenter;
+            self.setState(self.state);
+        }).catch(function(err){
+            var state = self.state;
+            state.data.error = {
+                message: err.message
             }
-        });          
+            state.view = "error";
+            self.setState(state);
+        });         
     },
 
     getClusterNetworks: function(){
         var self = this;
 
-        $.ajax({
-            url: apiurl + "/clusters/"+ id + "/networks",
-            type: "GET",
-            dataType: "text",
-            username: username,
-            password: password,
-
-            success: function(xml){
-                var networks = parseNetworks(xml);
-                var cluster = self.getClustersById(id);
-                cluster.data.networks = networks;
-
-                self.setState(self.state);
-            },
-
-            error: function(err){
-                var state = self.state;
-                state.data.error = {
-                    message: err.statusText
-                }
-                state.view = "error";
-                self.setState(state);
+        var cluster = getClusterById(id);
+        cluster.network.list().run().then(function(data){
+            var networks = data;
+            cluster.data.networks = networks;
+            self.setState(self.state);
+        }).catch(function(err){
+            var state = self.state;
+            state.data.error = {
+                message: err.message
             }
+            state.view="error";
+            self.setState(state);
         }); 
     },
 
-    showClusterDetail: function(){
+    showClusterDetail: function(id){
         var state = this.state;
 
         state.data.details.clusterId = id;
@@ -457,7 +395,7 @@ var rootComponent = React.createClass({
             }
 
             else{
-                this.getstatistics();
+                this.getStatistics();
             }
         }
 
@@ -539,6 +477,7 @@ var rootComponent = React.createClass({
                         }, 
                         React.createElement(networksComponent, {
                             data: this.state.data.networks,
+                            onNetwork: this.showNetworkDetails
                         })
                     )
                 );
@@ -548,6 +487,21 @@ var rootComponent = React.createClass({
                 this.getNetworks();
             }
         }
+
+        if(this.state.view === "network-detail"){
+            var network = this.getNetworkById(this.state.data.details.networkId);
+            return React.createElement("div", null, 
+                navElement,
+                React.createElement("div",
+                    {
+                        className: "container"
+                    },
+                    React.createElement(networkDetailComponent, {
+                        network: network
+                    })
+                )
+            )
+        }           
 
         if(this.state.view === "clusters"){
             if(this.state.loading.clusters){
@@ -561,7 +515,8 @@ var rootComponent = React.createClass({
                         className: "container"
                     },
                     React.createElement(clusterComponent,{
-                        data: this.state.data.clusters
+                        data: this.state.data.clusters,
+                        onCluster: this.showClusterDetail
                     })
                     )   
                 )
@@ -570,6 +525,21 @@ var rootComponent = React.createClass({
             else{
                 this.getClusters();
             }
+        }
+
+        if(this.state.view ==="cluster-detail"){
+            var cluster = this.getClusterById(this.state.data.details.clusterId);
+            return React.createElement("div", null,
+                navElement,
+                React.createElement("div",
+                    {   
+                        className: "container"
+                    },
+                    React.createElement(clusterDetailComponent, {
+                        cluster: cluster
+                    })
+                )
+            )
         }
 
         if(this.state.view === "error"){
