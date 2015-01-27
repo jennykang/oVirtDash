@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<networks>
+    <network href="/ovirt-engine/api/networks/00000000-0000-0000-0000-000000000009" id="00000000-0000-0000-0000-000000000009">
+        <name>ovirtmgmt</name>
+        <description>Management Network</description>
+        <link href="/ovirt-engine/api/networks/00000000-0000-0000-0000-000000000009/permissions" rel="permissions"/>
+        <link href="/ovirt-engine/api/networks/00000000-0000-0000-0000-000000000009/vnicprofiles" rel="vnicprofiles"/>
+        <link href="/ovirt-engine/api/networks/00000000-0000-0000-0000-000000000009/labels" rel="labels"/>
+        <data_center href="/ovirt-engine/api/datacenters/00000002-0002-0002-0002-0000000001bb" id="00000002-0002-0002-0002-0000000001bb"/>
+        <stp>false</stp>
+        <mtu>0</mtu>
+        <usages>
+            <usage>vm</usage>
+        </usages>
+    </network>
+    <network href="/ovirt-engine/api/networks/683d5a55-3849-4260-850a-c4fd8d12e5ca" id="683d5a55-3849-4260-850a-c4fd8d12e5ca">
+        <name>ovirtmgmt</name>
+        <description>Management Network</description>
+        <link href="/ovirt-engine/api/networks/683d5a55-3849-4260-850a-c4fd8d12e5ca/permissions" rel="permissions"/>
+        <link href="/ovirt-engine/api/networks/683d5a55-3849-4260-850a-c4fd8d12e5ca/vnicprofiles" rel="vnicprofiles"/>
+        <link href="/ovirt-engine/api/networks/683d5a55-3849-4260-850a-c4fd8d12e5ca/labels" rel="labels"/>
+        <data_center href="/ovirt-engine/api/datacenters/3f6fa753-f7b6-4576-bdb0-7185f825c9e2" id="3f6fa753-f7b6-4576-bdb0-7185f825c9e2"/>
+        <stp>false</stp>
+        <mtu>0</mtu>
+        <usages>
+            <usage>vm</usage>
+        </usages>
+    </network>
+</networks>

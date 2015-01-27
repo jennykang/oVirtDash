@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<storage_domains>
+    <storage_domain href="/ovirt-engine/api/storagedomains/05fea09c-8bc3-4252-85da-3c88c97cf55c" id="05fea09c-8bc3-4252-85da-3c88c97cf55c">
+        <name>ISO_DOMAIN</name>
+        <description>ISO_DOMAIN</description>
+        <comment/>
+        <link href="/ovirt-engine/api/storagedomains/05fea09c-8bc3-4252-85da-3c88c97cf55c/permissions" rel="permissions"/>
+        <link href="/ovirt-engine/api/storagedomains/05fea09c-8bc3-4252-85da-3c88c97cf55c/files" rel="files"/>
+        <link href="/ovirt-engine/api/storagedomains/05fea09c-8bc3-4252-85da-3c88c97cf55c/disksnapshots" rel="disksnapshots"/>
+        <link href="/ovirt-engine/api/storagedomains/05fea09c-8bc3-4252-85da-3c88c97cf55c/diskprofiles" rel="diskprofiles"/>
+        <type>iso</type>
+        <master>false</master>
+        <storage>
+            <address>livecd.localdomain</address>
+            <type>nfs</type>
+            <path>/var/lib/exports/iso</path>
+        </storage>
+        <available>0</available>
+        <used>0</used>
+        <committed>0</committed>
+        <storage_format>v1</storage_format>
+    </storage_domain>
+    <storage_domain href="/ovirt-engine/api/storagedomains/904ff8bd-7c47-4d55-bdd2-e6b74659c453" id="904ff8bd-7c47-4d55-bdd2-e6b74659c453">
+        <name>local_storage</name>
+        <link href="/ovirt-engine/api/storagedomains/904ff8bd-7c47-4d55-bdd2-e6b74659c453/permissions" rel="permissions"/>
+        <link href="/ovirt-engine/api/storagedomains/904ff8bd-7c47-4d55-bdd2-e6b74659c453/disks" rel="disks"/>
+        <link href="/ovirt-engine/api/storagedomains/904ff8bd-7c47-4d55-bdd2-e6b74659c453/storageconnections" rel="storageconnections"/>
+        <link href="/ovirt-engine/api/storagedomains/904ff8bd-7c47-4d55-bdd2-e6b74659c453/disksnapshots" rel="disksnapshots"/>
+        <link href="/ovirt-engine/api/storagedomains/904ff8bd-7c47-4d55-bdd2-e6b74659c453/diskprofiles" rel="diskprofiles"/>
+        <type>data</type>
+        <master>true</master>
+        <storage>
+            <type>localfs</type>
+            <path>/var/lib/images</path>
+        </storage>
+        <available>12884901888</available>
+        <used>3221225472</used>
+        <committed>6442450944</committed>
+        <storage_format>v3</storage_format>
+    </storage_domain>
+    <storage_domain href="/ovirt-engine/api/storagedomains/072fbaa1-08f3-4a40-9f34-a5ca22dd1d74" id="072fbaa1-08f3-4a40-9f34-a5ca22dd1d74">
+        <name>ovirt-image-repository</name>
+        <link href="/ovirt-engine/api/storagedomains/072fbaa1-08f3-4a40-9f34-a5ca22dd1d74/permissions" rel="permissions"/>
+        <link href="/ovirt-engine/api/storagedomains/072fbaa1-08f3-4a40-9f34-a5ca22dd1d74/images" rel="images"/>
+        <link href="/ovirt-engine/api/storagedomains/072fbaa1-08f3-4a40-9f34-a5ca22dd1d74/disksnapshots" rel="disksnapshots"/>
+        <link href="/ovirt-engine/api/storagedomains/072fbaa1-08f3-4a40-9f34-a5ca22dd1d74/diskprofiles" rel="diskprofiles"/>
+        <type>image</type>
+        <status>
+            <state>unattached</state>
+        </status>
+        <master>false</master>
+        <storage>
+            <type>glance</type>
+        </storage>
+        <available>0</available>
+        <used>0</used>
+        <committed>0</committed>
+        <storage_format>v1</storage_format>
+    </storage_domain>
+</storage_domains>
