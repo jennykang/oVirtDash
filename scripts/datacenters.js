@@ -22,19 +22,34 @@ var datacenterComponent = React.createClass({
                 datacenter.data.version.minor
             )
         )
+        if (self.props.onDatacenter) {
+            // make datacenter clickable
 
-        return React.createElement(ReactBootstrap.Panel, {
-                header: datacenter.data.name,
-                className: "anchor",
-                onClick: function(){
-                    self.props.onDatacenter(datacenter.data.id)
-                }
-            },
+            return React.createElement(ReactBootstrap.Panel, {
+                    header: datacenter.data.name,
+                    className: "anchor",
+                    onClick: function(){
+                        self.props.onDatacenter(datacenter.data.id)
+                    }
+                },
+                panelChildren
+            );
+
+        }
+
+        return React.createElement(ReactBootstrap.Panel, 
+            { header: datacenter.data.name },
             panelChildren
         );
     },
     
     render: function() {
+
+        var self = this;
+        if(!this.props.data){
+            return React.createElement(waitingComponent, null);
+        }
+
         var panelElems = [];
 
 
@@ -43,7 +58,7 @@ var datacenterComponent = React.createClass({
         }
 
         return React.createElement("div", null, 
-            React.createElement("h1", null, "Available Datacenters"), 
+            React.createElement("h1", null, "Datacenters"), 
             panelElems
         );
     }

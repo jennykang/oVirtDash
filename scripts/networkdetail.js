@@ -3,6 +3,11 @@ var networkDetailComponent = React.createClass({
 	render: function(){
 		var network = this.props.network;
 
+        var self = this;
+        if(!network){
+            return React.createElement(waitingComponent, null);
+        }
+
         var usage = "";
         if(network.data.usages.usage.length){
             usage = network.data.usages.usage[0];
@@ -26,10 +31,7 @@ var networkDetailComponent = React.createClass({
            		networkPanelChildren
         	),
        		React.createElement(datacenterComponent, {
-            	data: network.data.data_center
-        	}),        	
-        	React.createElement(clusterComponent, {
-            	data: network.data.clusters
+            	data: network.data.datacenters
         	})
         )
 	}

@@ -104,7 +104,6 @@ var rootComponent = React.createClass({
 
         return null;
     },
-
     getDatacenterNetworks: function(id){
         var self = this;
 
@@ -218,9 +217,10 @@ var rootComponent = React.createClass({
         var self = this;
 
         var network = this.getNetworkById(id);
-        network.data_center.list().run().then(function(data){
+        var networkDatacenterId = network.data.data_center.id;
+        ovirt.api.datacenters.get(networkDatacenterId).run().then(function(data){
             var datacenter = data;
-            network.data.datacenters = datacenters;
+            network.data.datacenters = [datacenter];
             self.setState(self.state);
         }).catch(function(err){
             var state = self.setState;
@@ -230,6 +230,18 @@ var rootComponent = React.createClass({
             state.view = "error";
             self.setState(state);
         })
+/*        network.data.data_center.list().run().then(function(data){
+            var datacenter = data;
+            network.data.datacenters = datacenter;
+            self.setState(self.state);
+        }).catch(function(err){
+            var state = self.setState;
+            state.data.error = {
+                message: err.message
+            }
+            state.view = "error";
+            self.setState(state);
+        })*/
     },
 
     showNetworkDetails: function(id){
@@ -237,7 +249,7 @@ var rootComponent = React.createClass({
 
         state.data.details.networkId = id;
 
-        //this.getNetworkDatacenters(id);
+        this.getNetworkDatacenters(id);
 
         state.view = "network-detail";
         this.setState(state);

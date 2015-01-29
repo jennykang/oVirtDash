@@ -1,11 +1,20 @@
 var datacenterDetailComponent = React.createClass({
 
 	render: function(){
+
+        if(!this.props.datacenter){
+            return React.createElement(waitingComponent, null);
+        }
+
 		var datacenter = this.props.datacenter;
+
+
+        var self = this;
+
 
 		var datacenterPanelChildren = [
             React.createElement("div", null, "ID: " + datacenter.data.id),
-            React.createElement("div", null, "Status: " + datacenter.data.status)
+            React.createElement("div", null, "Status: " + datacenter.data.status.state)
         ];
         
         if(datacenter.data.description){
@@ -16,8 +25,8 @@ var datacenterDetailComponent = React.createClass({
         datacenterPanelChildren.push(
             React.createElement("div", null, 
                 "Compatibility Version: " + 
-                datacenter.data.major + "." + 
-                datacenter.data.minor
+                datacenter.data.version.major + "." + 
+                datacenter.data.version.minor
             )
         );
 

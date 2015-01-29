@@ -20,6 +20,11 @@ var port = 8888;
 var ovirtProxy = httpProxy.createProxyServer();
 var fileServe = serveStatic(staticDir);
 
+ovirtProxy.on('proxyReq', function(proxyReq, req, res, options) {
+ 	proxyReq.setHeader('Access-Control-Allow-Origin', '*');
+ 	proxyReq.setHeader('Content-Type', 'text/plain');
+});
+
 var server = http.createServer(function(req, res) {
 	var url = req.url;
 

@@ -22,9 +22,9 @@ var networksComponent = React.createClass({
 
         return React.createElement(ReactBootstrap.Panel, {
                 header: network.data.name,
-                //className: "anchor",
+                className: "anchor",
                 onClick: function(){
-                    //self.props.onNetwork(network.data.id)
+                    self.props.onNetwork(network.data.id)
                 }
             }, panelChildren
         );
