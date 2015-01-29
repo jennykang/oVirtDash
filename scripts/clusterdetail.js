@@ -8,15 +8,15 @@ var clusterDetailComponent = React.createClass({
         
         if(cluster.data.description){
             var description = React.createElement("div", null, "Description: " + cluster.data.description);
-            panelChildren.push(description);
+            clusterPanelChildren.push(description);
         }
 
         if(cluster.data.cpu){
             var cpu = React.createElement("div", null, "CPU Type: " + cluster.data.cpu.id);
-            panelChildren.push(cpu);
+            clusterPanelChildren.push(cpu);
         }
 
-        panelChildren.push(
+        clusterPanelChildren.push(
             React.createElement("div", null, 
                 "Compatibility Version: " + 
                 cluster.data.version.major + "." + 
@@ -35,7 +35,7 @@ var clusterDetailComponent = React.createClass({
        		React.createElement(datacenterComponent, {
             	data: cluster.data.datacenters
         	}),        	
-        	React.createElement(networkComponent, {
+        	React.createElement(networksComponent, {
             	data: cluster.data.networks
         	})
         )

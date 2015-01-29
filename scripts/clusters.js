@@ -27,12 +27,20 @@ var clusterComponent = React.createClass({
             )
         );
 
+        if(self.props.onCluster){
+            return React.createElement(ReactBootstrap.Panel, {
+                    header: cluster.data.name,
+                    className: "anchor",
+                    onClick: function(){
+                        self.props.onCluster(cluster.data.id)
+                    }
+                },
+                panelChildren
+            );           
+        }
+
         return React.createElement(ReactBootstrap.Panel, {
                 header: cluster.data.name,
-                className: "anchor",
-                onClick: function(){
-                    self.props.onCluster(cluster.data.id)
-                }
             },
             panelChildren
         );

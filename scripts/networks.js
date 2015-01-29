@@ -20,12 +20,19 @@ var networksComponent = React.createClass({
             React.createElement("div", null, "Usage: " + usage)
         ];
 
+        if(self.props.onNetwork){
+            return React.createElement(ReactBootstrap.Panel, {
+                    header: network.data.name,
+                    className: "anchor",
+                    onClick: function(){
+                        self.props.onNetwork(network.data.id)
+                    }
+                }, panelChildren
+            );
+        }
+
         return React.createElement(ReactBootstrap.Panel, {
                 header: network.data.name,
-                className: "anchor",
-                onClick: function(){
-                    self.props.onNetwork(network.data.id)
-                }
             }, panelChildren
         );
     },

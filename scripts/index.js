@@ -230,19 +230,9 @@ var rootComponent = React.createClass({
             state.view = "error";
             self.setState(state);
         })
-/*        network.data.data_center.list().run().then(function(data){
-            var datacenter = data;
-            network.data.datacenters = datacenter;
-            self.setState(self.state);
-        }).catch(function(err){
-            var state = self.setState;
-            state.data.error = {
-                message: err.message
-            }
-            state.view = "error";
-            self.setState(state);
-        })*/
     },
+
+
 
     showNetworkDetails: function(id){
         var state = this.state;
@@ -296,11 +286,11 @@ var rootComponent = React.createClass({
     getClusterDatacenters: function(id){
         var self = this;
 
-        var cluster = getClusterById(id);
-        console.log(cluster);
-        cluster.data_center.list().run().then(function(data){
+        var cluster = this.getClusterById(id);
+        var clusterDatacenterID = cluster.data.data_center.id;
+        ovirt.api.datacenters.get(clusterDatacenterID).run().then(function(data){
             var datacenter = data;
-            cluster.data.datacenters = datacenter;
+            cluster.data.datacenters = [datacenter];
             self.setState(self.state);
         }).catch(function(err){
             var state = self.state;
@@ -312,11 +302,13 @@ var rootComponent = React.createClass({
         });         
     },
 
-    getClusterNetworks: function(){
+    getClusterNetworks: function(id){
         var self = this;
 
-        var cluster = getClusterById(id);
-        cluster.network.list().run().then(function(data){
+        var cluster = this.getClusterById(id); 
+
+
+        cluster.networks.list().run().then(function(data){
             var networks = data;
             cluster.data.networks = networks;
             self.setState(self.state);
