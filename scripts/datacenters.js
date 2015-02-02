@@ -24,7 +24,6 @@ var datacenterComponent = React.createClass({
         )
         if (self.props.onDatacenter) {
             // make datacenter clickable
-
             return React.createElement(ReactBootstrap.Panel, {
                     header: datacenter.data.name,
                     className: "anchor",
@@ -38,7 +37,7 @@ var datacenterComponent = React.createClass({
         }
 
         return React.createElement(ReactBootstrap.Panel, 
-            { header: datacenter.data.name },
+            {header: datacenter.data.name},
             panelChildren
         );
     },

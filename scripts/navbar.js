@@ -3,7 +3,11 @@ var navbarComponent =  React.createClass({
         var self = this;
         return React.createElement(ReactBootstrap.Navbar, {
                 brand: React.createElement("img", {
-                    src: "images/ovirt.png"
+                    src: "images/ovirt.png",
+                    onClick: function(){
+                        self.props.onView("home");
+                    },
+                    className: "anchor"
                 }),
                 defaultNavExpanded: true,
                 toggleButton: [

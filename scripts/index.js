@@ -34,7 +34,7 @@ var rootComponent = React.createClass({
                 networks: false,
                 clusters: false
             },  
-            view: "statistics",
+            view: "home",
             data: {
                 details: {
                     datacenterId: null,
@@ -379,6 +379,15 @@ var rootComponent = React.createClass({
             navElement,
             React.createElement(waitingComponent, null)
         );
+
+        if(this.state.view === "home"){
+            return React.createElement("div", null,
+                navElement,
+                React.createElement(homeComponent, {
+                    onView: this.changeView
+                })
+            );
+        }
 
         if(this.state.view === "statistics"){
             if(this.state.loading.statistics){
