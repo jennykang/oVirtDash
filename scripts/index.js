@@ -55,6 +55,7 @@ var rootComponent = React.createClass({
         if(this.state.loading.statistics){
             return; //statistics already loading so no need to get data again
         }
+        this.state.loading.statistics = true;
 
         var self = this;
         $.ajax({
@@ -74,6 +75,8 @@ var rootComponent = React.createClass({
 
             error: function(err){
                 var state = self.state;
+                state.loading.statistics = false;
+
                 state.data.error = {
                     message: err.statusText
                 }
@@ -153,6 +156,11 @@ var rootComponent = React.createClass({
     },
 
     getDatacenters: function(){
+
+        if(this.state.loading.datacenters){
+            return; //datacenters already loading so no need to get data again
+        }
+        this.state.loading.datacenters = true;
         var self = this;
 
         ovirt.api.datacenters.list().run().then(function(data){
@@ -170,12 +178,13 @@ var rootComponent = React.createClass({
 
         setTimeout(function() {
             var state =  self.state;
-            state.loading.datacenters = true;
+            state.loading.datacenters = false;
             self.setState(state);
         }, 0)
     },
 
     getStorage: function(){
+
         var self = this;
 
         ovirt.api.storagedomains.list().run().then(function(data){
@@ -248,6 +257,13 @@ var rootComponent = React.createClass({
     getNetworks: function(){
         var self = this;
 
+
+        if(this.state.loading.networks){
+            return; //networks already loading so no need to get data again
+        }
+        this.state.loading.networks = true;
+
+
         ovirt.api.networks.list().run().then(function(data){
             self.state.loading.networks = false;
             self.state.data.networks = data;
@@ -263,7 +279,8 @@ var rootComponent = React.createClass({
 
         setTimeout(function() {
             var state =  self.state;
-            state.loading.networks = true;
+            self.state.loading.networks = false;
+
             self.setState(state);
         }, 0)
     },
@@ -337,6 +354,12 @@ var rootComponent = React.createClass({
     getClusters: function(){
         var self = this;
 
+        if(this.state.loading.clusters){
+            return; //clusters already loading so no need to get data again
+        }
+        this.state.loading.clusters = true;
+
+
         ovirt.api.clusters.list().run().then(function(data){
             self.state.loading.clusters = false;
             self.state.data.clusters = data;
@@ -352,7 +375,7 @@ var rootComponent = React.createClass({
 
         setTimeout(function() {
             var state =  self.state;
-            state.loading.clusters = true;
+            self.state.loading.clusters = false;
             self.setState(state);
         }, 0)
     },
@@ -370,9 +393,26 @@ var rootComponent = React.createClass({
         });
 
         if(!this.state.initialized){
-            return React.createElement("div", {
-                className: "container"
-            }, React.createElement(waitingComponent, null));
+            return React.createElement("div", 
+                {className: "container"}, 
+                React.createElement(waitingComponent, null)
+            );
+        }
+
+        if(!this.state.data.datacenters) {
+            this.getDatacenters();
+        }
+
+        if(!this.state.data.networks) {
+            this.getNetworks();
+        }
+
+        if(!this.state.data.storage){
+            this.getStorage();
+        }
+
+        if(!this.state.data.clusters) {
+            this.getClusters();
         }
 
         var waitingElement = React.createElement("div", null, 
@@ -381,59 +421,42 @@ var rootComponent = React.createClass({
         );
 
         if(this.state.view === "home"){
+            if (!this.state.data.statistics){
+                this.getStatistics();
+            }
+
             return React.createElement("div", null,
                 navElement,
                 React.createElement(homeComponent, {
-                    onView: this.changeView
+                    onView: this.changeView,
+                    statistics: this.state.data.statistics
                 })
             );
         }
 
         if(this.state.view === "statistics"){
-            if(this.state.loading.statistics){
-                return waitingElement;
-            }
-
-            if(this.state.data.statistics){
-                return React.createElement("div", null, 
-                    navElement,
-                    React.createElement("div", {
-                            className: "container"
-                        }, 
-                        React.createElement(statisticsComponent, {
-                            data: this.state.data.statistics
-                        })
-                    )
-                );
-            }
-
-            else{
-                this.getStatistics();
-            }
+            return React.createElement("div", null, 
+                navElement,
+                React.createElement("div", 
+                    {className: "container"}, 
+                    React.createElement(statisticsComponent, {
+                        data: this.state.data.statistics
+                    })
+                )
+            );
         }
 
         if(this.state.view === "datacenters"){
-            if(this.state.loading.datacenters){
-                return waitingElement;
-            }
-
-            if(this.state.data.datacenters){
-                return React.createElement("div", null, 
-                    navElement,
-                    React.createElement("div", 
-                        {
-                            className: "container"
-                        }, 
-                        React.createElement(datacenterComponent, {
-                            data: this.state.data.datacenters,
-                            onDatacenter: this.showDatacenterDetails
-                        })
-                    )
-                );
-            }
-            else {
-                this.getDatacenters();
-            }
+            return React.createElement("div", null, 
+                navElement,
+                React.createElement("div", 
+                    {className: "container"}, 
+                    React.createElement(datacenterComponent, {
+                        data: this.state.data.datacenters,
+                        onDatacenter: this.showDatacenterDetails
+                    })
+                )
+            );
         }
 
         if(this.state.view === "datacenter-detail"){
@@ -441,9 +464,7 @@ var rootComponent = React.createClass({
             return React.createElement("div", null, 
                 navElement,
                 React.createElement("div",
-                    {
-                        className: "container"
-                    },
+                    {className: "container"},
                     React.createElement(datacenterDetailComponent, {
                         datacenter: datacenter
                     })
@@ -452,53 +473,29 @@ var rootComponent = React.createClass({
         }           
 
         if(this.state.view === "storage"){
-            if(this.state.loading.storage){
-                return waitingElement;
-            }
-
-            if(this.state.data.storage){
-                return React.createElement("div", null,
-                    navElement,
-                    React.createElement("div", 
-                        {
-                            className: "container"
-                        },
-                        React.createElement(storageComponent,{
-                            data: this.state.data.storage,
-                            onStorage: this.showStorageDetails
-                        })
-                    )
-                );
-            }
-
-            else{
-                this.getStorage();
-            }
+            return React.createElement("div", null,
+                navElement,
+                React.createElement("div", 
+                    {className: "container"},
+                    React.createElement(storageComponent,{
+                        data: this.state.data.storage,
+                        onStorage: this.showStorageDetails
+                    })
+                )
+            );
         }
 
         if(this.state.view === "networks"){
-            if(this.state.loading.networks){
-                return waitingElement;
-            }
-
-            if(this.state.data.networks){
-                return React.createElement("div", null, 
-                    navElement,
-                    React.createElement("div", 
-                        {
-                            className: "container"
-                        }, 
-                        React.createElement(networksComponent, {
-                            data: this.state.data.networks,
-                            onNetwork: this.showNetworkDetails
-                        })
-                    )
-                );
-            }
-
-            else{
-                this.getNetworks();
-            }
+            return React.createElement("div", null, 
+                navElement,
+                React.createElement("div", 
+                    {className: "container"}, 
+                    React.createElement(networksComponent, {
+                        data: this.state.data.networks,
+                        onNetwork: this.showNetworkDetails
+                    })
+                )
+            );
         }
 
         if(this.state.view === "network-detail"){
@@ -506,9 +503,7 @@ var rootComponent = React.createClass({
             return React.createElement("div", null, 
                 navElement,
                 React.createElement("div",
-                    {
-                        className: "container"
-                    },
+                    {className: "container"},
                     React.createElement(networkDetailComponent, {
                         network: network
                     })
@@ -517,27 +512,16 @@ var rootComponent = React.createClass({
         }           
 
         if(this.state.view === "clusters"){
-            if(this.state.loading.clusters){
-                return waitingElement;
-            }
-
-            if(this.state.data.clusters){
-                return React.createElement("div", null,
-                    navElement,
-                    React.createElement("div", {
-                        className: "container"
-                    },
+            return React.createElement("div", null,
+                navElement,
+                React.createElement("div", 
+                    {className: "container"},
                     React.createElement(clusterComponent,{
                         data: this.state.data.clusters,
                         onCluster: this.showClusterDetail
                     })
-                    )   
-                )
-            }
-
-            else{
-                this.getClusters();
-            }
+                )   
+            );
         }
 
         if(this.state.view ==="cluster-detail"){

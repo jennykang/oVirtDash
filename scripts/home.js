@@ -2,6 +2,19 @@ var homeComponent = React.createClass({
 
 	render: function(){
 		var self = this;
+		var statisticsElement = null;
+		if(self.props.statistics){
+			statisticsElement = [
+                React.createElement("div", null, "Total VMs: " + this.props.statistics.summary.vms.total),
+                React.createElement("div", null, "Active VMs: " + this.props.statistics.summary.vms.active),
+           		React.createElement("div", null, "Time: " + this.props.statistics.time)
+			];
+		} 
+
+		else {
+			statisticsElement = React.createElement(waitingComponent, null);
+		}
+
 		return React.createElement("div", 
 			{
 				className: "container"
@@ -9,7 +22,7 @@ var homeComponent = React.createClass({
 			React.createElement("div", {className: "row"}, 
 				React.createElement("div", {className: "col-sm-3"}, 
 					React.createElement(ReactBootstrap.Panel, 
-						{
+						{ 
 							style: {textAlign: 'center'},
 							onClick: function(){
 								self.props.onView("datacenters")
@@ -59,6 +72,14 @@ var homeComponent = React.createClass({
 						React.createElement("h3", null, "Storage")
 					)
 				)
+			),
+			React.createElement("div", {className: "row"},
+				React.createElement("div", {className: 'col-sm-5 col-lg-3'},
+					React.createElement(ReactBootstrap.Panel, 
+						{header: "Summary"},
+		                statisticsElement
+	           		)
+           		)
 			)
 		)
 	}
