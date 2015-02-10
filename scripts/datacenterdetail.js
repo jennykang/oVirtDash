@@ -32,12 +32,17 @@ var datacenterDetailComponent = React.createClass({
 
         return React.createElement("div", null,
         	React.createElement("h1", null, "Datacenter"),
-  		    React.createElement(ReactBootstrap.Panel, 
-  		    	{
-                	header: datacenter.data.name 
-            	},
-           		datacenterPanelChildren
-        	),
+            React.createElement("div", {className: "row"},
+                React.createElement("div", {className: "col-md-4"},
+                    React.createElement(ReactBootstrap.Panel, 
+                        {
+                            header: datacenter.data.name 
+                        },
+                        datacenterPanelChildren
+                    )
+                )
+
+            ),
        		React.createElement(networksComponent, {
             	data: datacenter.data.networks
         	}),        	

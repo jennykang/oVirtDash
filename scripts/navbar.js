@@ -10,17 +10,7 @@ var navbarComponent =  React.createClass({
                     className: "anchor"
                 }),
                 defaultNavExpanded: true,
-                toggleButton: [
-                    React.createElement("span", {
-                        className: "sr-only"
-                    }, "Toggle Navigation"),
-                    React.createElement("span", {
-                        className: "icon-bar"
-                    }),
-                    React.createElement("span", {
-                        className: "icon-bar"
-                    })
-                ]
+                toggleNavKey: 1
             }, 
             React.createElement(ReactBootstrap.Nav, {
                 onSelect: function(eventKey){
@@ -28,10 +18,10 @@ var navbarComponent =  React.createClass({
                 }
             },
 
-                React.createElement(ReactBootstrap.NavItem, {
+                /*React.createElement(ReactBootstrap.NavItem, {
                     eventKey:"statistics",
                     href: "#"
-                }, "Statistics"),
+                }, "Statistics"),*/
 
                 React.createElement(ReactBootstrap.NavItem, {
                     eventKey: "datacenters",

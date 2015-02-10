@@ -26,12 +26,16 @@ var clusterDetailComponent = React.createClass({
         
         return React.createElement("div", null,
         	React.createElement("h1", null, "Cluster"),
-  		    React.createElement(ReactBootstrap.Panel, 
-  		    	{
-                	header: cluster.data.name 
-            	},
-           		clusterPanelChildren
-        	),
+            React.createElement("div", {className: "row"},
+                React.createElement("div", {className: "col-md-4"},
+                    React.createElement(ReactBootstrap.Panel, 
+                        {
+                            header: cluster.data.name 
+                        },
+                        clusterPanelChildren
+                    )
+                )
+             ),
        		React.createElement(datacenterComponent, {
             	data: cluster.data.datacenters
         	}),        	

@@ -24,15 +24,21 @@ var networkDetailComponent = React.createClass({
         
         return React.createElement("div", null,
         	React.createElement("h1", null, "Network"),
-  		    React.createElement(ReactBootstrap.Panel, 
-  		    	{
-                	header: network.data.name 
-            	},
-           		networkPanelChildren
-        	),
-       		React.createElement(datacenterComponent, {
-            	data: network.data.datacenters
-        	})
+            React.createElement("div", {className: "row"},
+                React.createElement("div", {className: "col-md-4"},
+                    React.createElement(ReactBootstrap.Panel, 
+                        {
+                            header: network.data.name 
+                        },
+                        networkPanelChildren
+                    )
+                )
+            ),
+            React.createElement("div", null,
+                React.createElement(datacenterComponent, {
+                    data: network.data.datacenters
+                })
+            )
         )
 	}
 })

@@ -7,7 +7,7 @@ if(!username || !password || !enginehost){
 }
 
 var apiurl = "http://" + enginehost + "/ovirt-engine/api";
-ovirt.api.options.engineBaseUrl = "http://" + enginehost;
+ovirt.api.options.engineBaseUrl = "http://" + encodeURIComponent(username) + ':' + password + '@' + enginehost;
 
 var rootComponent = React.createClass({
     componentDidMount: function(){
@@ -20,6 +20,7 @@ var rootComponent = React.createClass({
         });
         promise.catch(function(){
             alert("Cannot connect. Going back to sign in page");
+			return;
             window.location = "login.html";
         });
     },
@@ -33,7 +34,7 @@ var rootComponent = React.createClass({
                 storage: false,
                 networks: false,
                 clusters: false
-            },  
+            },
             view: "home",
             data: {
                 details: {
@@ -316,13 +317,13 @@ var rootComponent = React.createClass({
             }
             state.view = "error";
             self.setState(state);
-        });         
+        });
     },
 
     getClusterNetworks: function(id){
         var self = this;
 
-        var cluster = this.getClusterById(id); 
+        var cluster = this.getClusterById(id);
 
 
         cluster.networks.list().run().then(function(data){
@@ -336,7 +337,7 @@ var rootComponent = React.createClass({
             }
             state.view="error";
             self.setState(state);
-        }); 
+        });
     },
 
     showClusterDetail: function(id){
@@ -393,8 +394,8 @@ var rootComponent = React.createClass({
         });
 
         if(!this.state.initialized){
-            return React.createElement("div", 
-                {className: "container"}, 
+            return React.createElement("div",
+                {className: "container"},
                 React.createElement(waitingComponent, null)
             );
         }
@@ -415,7 +416,7 @@ var rootComponent = React.createClass({
             this.getClusters();
         }
 
-        var waitingElement = React.createElement("div", null, 
+        var waitingElement = React.createElement("div", null,
             navElement,
             React.createElement(waitingComponent, null)
         );
@@ -434,23 +435,23 @@ var rootComponent = React.createClass({
             );
         }
 
-        if(this.state.view === "statistics"){
-            return React.createElement("div", null, 
+/*        if(this.state.view === "statistics"){
+            return React.createElement("div", null,
                 navElement,
-                React.createElement("div", 
-                    {className: "container"}, 
+                React.createElement("div",
+                    {className: "container"},
                     React.createElement(statisticsComponent, {
                         data: this.state.data.statistics
                     })
                 )
             );
-        }
+        }*/
 
         if(this.state.view === "datacenters"){
-            return React.createElement("div", null, 
+            return React.createElement("div", null,
                 navElement,
-                React.createElement("div", 
-                    {className: "container"}, 
+                React.createElement("div",
+                    {className: "container"},
                     React.createElement(datacenterComponent, {
                         data: this.state.data.datacenters,
                         onDatacenter: this.showDatacenterDetails
@@ -461,7 +462,7 @@ var rootComponent = React.createClass({
 
         if(this.state.view === "datacenter-detail"){
             var datacenter = this.getDatacenterById(this.state.data.details.datacenterId);
-            return React.createElement("div", null, 
+            return React.createElement("div", null,
                 navElement,
                 React.createElement("div",
                     {className: "container"},
@@ -470,12 +471,12 @@ var rootComponent = React.createClass({
                     })
                 )
             )
-        }           
+        }
 
         if(this.state.view === "storage"){
             return React.createElement("div", null,
                 navElement,
-                React.createElement("div", 
+                React.createElement("div",
                     {className: "container"},
                     React.createElement(storageComponent,{
                         data: this.state.data.storage,
@@ -486,10 +487,10 @@ var rootComponent = React.createClass({
         }
 
         if(this.state.view === "networks"){
-            return React.createElement("div", null, 
+            return React.createElement("div", null,
                 navElement,
-                React.createElement("div", 
-                    {className: "container"}, 
+                React.createElement("div",
+                    {className: "container"},
                     React.createElement(networksComponent, {
                         data: this.state.data.networks,
                         onNetwork: this.showNetworkDetails
@@ -500,7 +501,7 @@ var rootComponent = React.createClass({
 
         if(this.state.view === "network-detail"){
             var network = this.getNetworkById(this.state.data.details.networkId);
-            return React.createElement("div", null, 
+            return React.createElement("div", null,
                 navElement,
                 React.createElement("div",
                     {className: "container"},
@@ -509,18 +510,18 @@ var rootComponent = React.createClass({
                     })
                 )
             )
-        }           
+        }
 
         if(this.state.view === "clusters"){
             return React.createElement("div", null,
                 navElement,
-                React.createElement("div", 
+                React.createElement("div",
                     {className: "container"},
                     React.createElement(clusterComponent,{
                         data: this.state.data.clusters,
                         onCluster: this.showClusterDetail
                     })
-                )   
+                )
             );
         }
 
@@ -529,7 +530,7 @@ var rootComponent = React.createClass({
             return React.createElement("div", null,
                 navElement,
                 React.createElement("div",
-                    {   
+                    {
                         className: "container"
                     },
                     React.createElement(clusterDetailComponent, {
@@ -540,13 +541,13 @@ var rootComponent = React.createClass({
         }
 
         if(this.state.view === "error"){
-            return React.createElement("div", null, 
+            return React.createElement("div", null,
                 navElement,
                 React.createElement("h1", null, "error: " + this.state.data.error.message)
             );
         }
 
-        return React.createElement("div", null, 
+        return React.createElement("div", null,
             navElement
         );
     }

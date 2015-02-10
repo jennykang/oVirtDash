@@ -28,10 +28,10 @@ ovirtProxy.on('proxyReq', function(proxyReq, req, res, options) {
 var server = http.createServer(function(req, res) {
 	var url = req.url;
 
-	if (url.indexOf('/ovirt-engine/api') != -1) {
+	if (url.indexOf('/ovirt-engine') != -1) {
 		ovirtProxy.web(req, res, {
 			secure: false,
-			target: 'https://' + ovirtHost,
+			target: ovirtHost,
 
 			changeOrigin: true,
 			hostRewrite: true
@@ -48,6 +48,6 @@ var server = http.createServer(function(req, res) {
 	});
 });
 
-server.listen(port);
+server.listen(port, '0.0.0.0');
 console.log("Proxy listening on http://localhost:" + port);
 

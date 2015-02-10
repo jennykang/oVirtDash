@@ -24,21 +24,26 @@ var datacenterComponent = React.createClass({
         )
         if (self.props.onDatacenter) {
             // make datacenter clickable
-            return React.createElement(ReactBootstrap.Panel, {
-                    header: datacenter.data.name,
-                    className: "anchor",
-                    onClick: function(){
-                        self.props.onDatacenter(datacenter.data.id)
-                    }
-                },
-                panelChildren
+            return React.createElement("div", {className: "col-md-4"},
+                React.createElement(ReactBootstrap.Panel, {
+                        header: datacenter.data.name,
+                        className: "anchor",
+                        onClick: function(){
+                            self.props.onDatacenter(datacenter.data.id)
+                        }
+                    },
+                    panelChildren
+                )
             );
-
         }
 
-        return React.createElement(ReactBootstrap.Panel, 
-            {header: datacenter.data.name},
-            panelChildren
+        return React.createElement("div", {className: "col-md-4"},
+            React.createElement(ReactBootstrap.Panel, 
+                {
+                    header: datacenter.data.name,
+                },
+                panelChildren
+            )
         );
     },
     
@@ -49,16 +54,24 @@ var datacenterComponent = React.createClass({
             return React.createElement(waitingComponent, null);
         }
 
-        var panelElems = [];
-
+        var rowElems = [];
+        var tempElems = [];
 
         for(var i = 0; i < this.props.data.length; i++){
-            panelElems.push(this.getDatacenterPanel(this.props.data[i]));
+            if(tempElems.length === 3){
+                rowElems.push(React.createElement("div", {className: "row"}, tempElems));
+                tempElems = [];
+            }
+            tempElems.push(this.getDatacenterPanel(this.props.data[i]));
+        }
+        if(tempElems.length){
+            rowElems.push(React.createElement("div", {className: "row"}, tempElems));
+            tempElems = [];
         }
 
         return React.createElement("div", null, 
             React.createElement("h1", null, "Datacenters"), 
-            panelElems
+            rowElems
         );
     }
 })

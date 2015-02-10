@@ -8,7 +8,7 @@ $(document).ready(function(){
 
 	if(docCookies.hasItem("password")){
 		$("#inputPassword").val(docCookies.getItem("password"));
-	} 
+	}
 
 	if(docCookies.hasItem("enginehost")){
 		$("#inputEngine").val(docCookies.getItem("enginehost"));
@@ -43,12 +43,22 @@ $(document).ready(function(){
 
 
 		var apiurl = "http://" + enginehost + "/ovirt-engine/api";
+
+		jQuery.support.cors = true;
+		function make_base_auth(user, password) {
+			var tok = user + ':' + password;
+			var hash = btoa(tok);
+
+			return "Basic " + hash;
+		}
+
 		$.ajax({
 			url: apiurl,
 			type: "GET",
 			dataType: "xml",
-			username: username,
-			password: password,
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader("Authorization", make_base_auth(username, password));
+			},
 
 			success: function(data){
 				$(".alert-success").removeClass("collapse");
