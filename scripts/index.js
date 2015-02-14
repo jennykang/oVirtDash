@@ -24,12 +24,20 @@ var rootComponent = React.createClass({
             window.location = "login.html";
         });
     },
+	onError: function(err) {
+		var self = this;
+		var state = self.state;
+		state.data.error = {
+			message: err.message
+		}
+		state.view = "error";
+		self.setState(state);
+	},
 
     getInitialState: function(){
         return {
             initialized: false,
             loading: {
-                statistics: false,
                 datacenters: false,
                 storage: false,
                 networks: false,
@@ -42,7 +50,6 @@ var rootComponent = React.createClass({
                     networkId: null,
                     clusterId: null
                 },
-                statistics: null,
                 datacenters: null,
                 storage: null,
                 networks: null,
@@ -50,47 +57,6 @@ var rootComponent = React.createClass({
                 error: null
             }
         }
-    },
-
-    getStatistics: function(){
-        if(this.state.loading.statistics){
-            return; //statistics already loading so no need to get data again
-        }
-        this.state.loading.statistics = true;
-
-        var self = this;
-        $.ajax({
-            url: apiurl,
-            type: "GET",
-            dataType: "text",
-            username: username,
-            password: password,
-
-            success: function(data){
-                var statistics = parseStatistics(data);
-                var state = self.state;
-                state.loading.statistics = false;
-                state.data.statistics = statistics;
-                self.setState(state);
-            },
-
-            error: function(err){
-                var state = self.state;
-                state.loading.statistics = false;
-
-                state.data.error = {
-                    message: err.statusText
-                }
-                state.view = "error";
-                self.setState(state);
-            }
-        });
-
-        setTimeout(function() {
-            var state =  self.state;
-            state.loading.statistics = true;
-            self.setState(state);
-        }, 0);
     },
 
     getDatacenterById: function(id) {
@@ -113,17 +79,14 @@ var rootComponent = React.createClass({
 
         var datacenter = this.getDatacenterById(id);
         datacenter.networks.list().run().then(function(data){
+			if (!data) {
+				return this.onError(new Error("did not get data successfully!!"));
+			}
             var networks = data;
             datacenter.data.networks = networks;
             self.setState(self.state);
-        }).catch(function(err){
-            var state = self.state;
-            state.data.error = {
-                message: err.message
-            }
-            state.view = "error";
-            self.setState(state);
-        });
+        }).catch(this.onError);
+
     },
 
     getDatacenterClusters: function(id){
@@ -134,14 +97,7 @@ var rootComponent = React.createClass({
             var clusters = data;
             datacenter.data.clusters = clusters;
             self.setState(self.state);
-        }).catch(function(err){
-            var state = self.state;
-            state.data.error = {
-                message: err.message
-            }
-            state.view = "error";
-            self.setState(state);
-        });
+        }).catch(this.onError);
     },
 
     showDatacenterDetails: function(id) {
@@ -161,51 +117,43 @@ var rootComponent = React.createClass({
         if(this.state.loading.datacenters){
             return; //datacenters already loading so no need to get data again
         }
+
         this.state.loading.datacenters = true;
+
         var self = this;
 
         ovirt.api.datacenters.list().run().then(function(data){
+			if (!data) {
+				return this.onError(new Error("did not get data successfully!!"));
+			}
+
             self.state.loading.datacenters = false;
             self.state.data.datacenters = data;
             self.setState(self.state);
-        }).catch(function(err){
-            var state = self.state;
-            state.data.error = {
-                message: err.message
-            }
-            state.view = "error";
-            self.setState(state);
-        })
-
-        setTimeout(function() {
-            var state =  self.state;
-            state.loading.datacenters = false;
-            self.setState(state);
-        }, 0)
+        }).catch(this.onError)
     },
 
     getStorage: function(){
 
         var self = this;
 
+
+        if(this.state.loading.storage){
+            return; //storage already loading so no need to get data again
+        }
+        this.state.loading.storage = true;
+
+
         ovirt.api.storagedomains.list().run().then(function(data){
+
+			if (!data) {
+				return this.onError(new Error("did not get data successfully!!"));
+			}
             self.state.loading.storage = false;
             self.state.data.storage = data;
             self.setState(self.state);
-        }).catch(function(err){
-            var state = self.setState;
-            state.data.error = {
-                message: err.message
-            }
-            state.view = "error";
-            self.setState(state);
-        })
+        }).catch(this.onError)
 
-        setTimeout(function(){
-            var state = self.state;
-            state.loading.storage = true;
-            self.setState(state);
-        }, 0);
     },
 
     getNetworkById: function(id){
@@ -229,17 +177,14 @@ var rootComponent = React.createClass({
         var network = this.getNetworkById(id);
         var networkDatacenterId = network.data.data_center.id;
         ovirt.api.datacenters.get(networkDatacenterId).run().then(function(data){
+
+			if (!data) {
+				return this.onError(new Error("did not get data successfully!!"));
+			}
             var datacenter = data;
             network.data.datacenters = [datacenter];
             self.setState(self.state);
-        }).catch(function(err){
-            var state = self.setState;
-            state.data.error = {
-                message: err.message
-            }
-            state.view = "error";
-            self.setState(state);
-        })
+        }).catch(this.onError)
     },
 
 
@@ -266,24 +211,14 @@ var rootComponent = React.createClass({
 
 
         ovirt.api.networks.list().run().then(function(data){
+
+			if (!data) {
+				return this.onError(new Error("did not get data successfully!!"));
+			}
             self.state.loading.networks = false;
             self.state.data.networks = data;
             self.setState(self.state);
-        }).catch(function(err){
-            var state = self.state;
-            state.data.error = {
-                message: err.message
-            }
-            state.view = "error";
-            self.setState(state);
-        })
-
-        setTimeout(function() {
-            var state =  self.state;
-            self.state.loading.networks = false;
-
-            self.setState(state);
-        }, 0)
+        }).catch(this.onError)
     },
 
     getClusterById: function(id){
@@ -307,17 +242,15 @@ var rootComponent = React.createClass({
         var cluster = this.getClusterById(id);
         var clusterDatacenterID = cluster.data.data_center.id;
         ovirt.api.datacenters.get(clusterDatacenterID).run().then(function(data){
+
+			if (!data) {
+				return this.onError(new Error("did not get data successfully!!"));
+			}
+
             var datacenter = data;
             cluster.data.datacenters = [datacenter];
             self.setState(self.state);
-        }).catch(function(err){
-            var state = self.state;
-            state.data.error = {
-                message: err.message
-            }
-            state.view = "error";
-            self.setState(state);
-        });
+        }).catch(this.onError);
     },
 
     getClusterNetworks: function(id){
@@ -330,14 +263,7 @@ var rootComponent = React.createClass({
             var networks = data;
             cluster.data.networks = networks;
             self.setState(self.state);
-        }).catch(function(err){
-            var state = self.state;
-            state.data.error = {
-                message: err.message
-            }
-            state.view="error";
-            self.setState(state);
-        });
+        }).catch(this.onError);
     },
 
     showClusterDetail: function(id){
@@ -362,23 +288,14 @@ var rootComponent = React.createClass({
 
 
         ovirt.api.clusters.list().run().then(function(data){
+
+			if (!data) {
+				return this.onError(new Error("did not get data successfully!!"));
+			}
             self.state.loading.clusters = false;
             self.state.data.clusters = data;
             self.setState(self.state);
-        }).catch(function(err){
-            var state = self.state;
-            state.data.error = {
-                message: err.message
-            }
-            state.view = "error";
-            self.setState(state);
-        })
-
-        setTimeout(function() {
-            var state =  self.state;
-            self.state.loading.clusters = false;
-            self.setState(state);
-        }, 0)
+        }).catch(this.onError)
     },
 
     changeView: function(view){
@@ -397,6 +314,13 @@ var rootComponent = React.createClass({
             return React.createElement("div",
                 {className: "container"},
                 React.createElement(waitingComponent, null)
+            );
+        }
+
+        if(this.state.view === "error"){
+            return React.createElement("div", null,
+                navElement,
+                React.createElement("h1", null, "error: " + this.state.data.error.message)
             );
         }
 
@@ -422,30 +346,13 @@ var rootComponent = React.createClass({
         );
 
         if(this.state.view === "home"){
-            if (!this.state.data.statistics){
-                this.getStatistics();
-            }
-
             return React.createElement("div", null,
                 navElement,
                 React.createElement(homeComponent, {
-                    onView: this.changeView,
-                    statistics: this.state.data.statistics
+                    onView: this.changeView
                 })
             );
         }
-
-/*        if(this.state.view === "statistics"){
-            return React.createElement("div", null,
-                navElement,
-                React.createElement("div",
-                    {className: "container"},
-                    React.createElement(statisticsComponent, {
-                        data: this.state.data.statistics
-                    })
-                )
-            );
-        }*/
 
         if(this.state.view === "datacenters"){
             return React.createElement("div", null,
@@ -538,13 +445,6 @@ var rootComponent = React.createClass({
                     })
                 )
             )
-        }
-
-        if(this.state.view === "error"){
-            return React.createElement("div", null,
-                navElement,
-                React.createElement("h1", null, "error: " + this.state.data.error.message)
-            );
         }
 
         return React.createElement("div", null,
