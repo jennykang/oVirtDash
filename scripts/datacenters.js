@@ -1,5 +1,5 @@
 var datacenterComponent = React.createClass({
-    getDatacenterPanel: function(datacenter) {
+    getDatacenterPanel: function(datacenter){
         var self = this;
         if(!this.props.data){
             return React.createElement(waitingComponet, null)

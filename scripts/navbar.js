@@ -18,11 +18,6 @@ var navbarComponent =  React.createClass({
                 }
             },
 
-                /*React.createElement(ReactBootstrap.NavItem, {
-                    eventKey:"statistics",
-                    href: "#"
-                }, "Statistics"),*/
-
                 React.createElement(ReactBootstrap.NavItem, {
                     eventKey: "datacenters",
                     href: "#"
@@ -41,7 +36,12 @@ var navbarComponent =  React.createClass({
                 React.createElement(ReactBootstrap.NavItem, {
                     eventKey: "clusters",
                     href: "#"
-                }, "Clusters")
+                }, "Clusters"),
+
+                React.createElement(ReactBootstrap.NavItem, {
+                    eventKey: "vms",
+                    href: "#"
+                }, "VMs")
             ),
 
             React.createElement("form", {

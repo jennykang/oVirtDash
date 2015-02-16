@@ -7,11 +7,12 @@ var homeComponent = React.createClass({
 			{
 				className: "container"
 			},
+
 			React.createElement("div", {className: "row"},
 				React.createElement("div", {className: "col-sm-3"},
 					React.createElement(ReactBootstrap.Panel,
 						{
-							style: {textAlign: 'center'},
+							style: {textAlign: "center"},
 							onClick: function(){
 								self.props.onView("datacenters")
 							},
@@ -21,10 +22,11 @@ var homeComponent = React.createClass({
 						React.createElement("h3", null, "Datacenters")
 					)
 				),
+
 				React.createElement("div", {className: "col-sm-3"},
 					React.createElement(ReactBootstrap.Panel,
 						{
-							style: {textAlign: 'center'},
+							style: {textAlign: "center"},
 							onClick: function(){
 								self.props.onView("networks")
 							},
@@ -34,10 +36,11 @@ var homeComponent = React.createClass({
 						React.createElement("h3", null, "Networks")
 					)
 				),
+
 				React.createElement("div", {className: "col-sm-3"},
 					React.createElement(ReactBootstrap.Panel,
 						{
-							style: {textAlign: 'center'},
+							style: {textAlign: "center"},
 							onClick: function(){
 								self.props.onView("clusters")
 							},
@@ -47,10 +50,11 @@ var homeComponent = React.createClass({
 						React.createElement("h3", null, "Clusters")
 					)
 				),
+
 				React.createElement("div", {className: "col-sm-3"},
 					React.createElement(ReactBootstrap.Panel,
 						{
-							style: {textAlign: 'center'},
+							style: {textAlign: "center"},
 							onClick: function(){
 								self.props.onView("storage")
 							},
@@ -58,6 +62,20 @@ var homeComponent = React.createClass({
 						},
 						React.createElement("img", {src: "images/storage-icon.png"}),
 						React.createElement("h3", null, "Storage")
+					)
+				),
+
+				React.createElement("div", {className: "col-sm-3"},
+					React.createElement(ReactBootstrap.Panel,
+						{
+							style: {textAlign: "center"},
+							onClick: function(){
+								self.props.onView("vms")
+							},
+							className: "anchor"
+						},
+						React.createElement("img", {src: "images/vm-icon.png"}),
+						React.createElement("h3", null, "VMs")
 					)
 				)
 			)

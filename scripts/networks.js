@@ -1,4 +1,4 @@
-var networksComponent = React.createClass({
+var networkComponent = React.createClass({
     getNetworkPanel: function(network){
         var self = this;
         if(!this.props.data){
