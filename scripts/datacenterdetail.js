@@ -43,7 +43,7 @@ var datacenterDetailComponent = React.createClass({
                 )
 
             ),
-       		React.createElement(networksComponent, {
+       		React.createElement(networkComponent, {
             	data: datacenter.data.networks
         	}),        	
         	React.createElement(clusterComponent, {

@@ -39,7 +39,7 @@ var clusterDetailComponent = React.createClass({
        		React.createElement(datacenterComponent, {
             	data: cluster.data.datacenters
         	}),        	
-        	React.createElement(networksComponent, {
+        	React.createElement(networkComponent, {
             	data: cluster.data.networks
         	})
         )
