@@ -41,7 +41,12 @@ var navbarComponent =  React.createClass({
                 React.createElement(ReactBootstrap.NavItem, {
                     eventKey: "vms",
                     href: "#"
-                }, "VMs")
+                }, "VMs"),
+
+                React.createElement(ReactBootstrap.NavItem, {
+                    eventKey: "events",
+                    href: "#"
+                }, "Events")
             ),
 
             React.createElement("form", {

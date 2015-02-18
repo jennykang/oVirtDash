@@ -33,9 +33,21 @@ var networkComponent = React.createClass({
             );
         }
 
+        var onClick = null;
+        var className = null;
+        
+        if(self.props.onNetwork){
+            className = "anchor";
+            onClick = function(){
+                self.props.onNetwork(network.data.id)
+            };
+        }
+
         return React.createElement("div", {className: "col-md-4"},
             React.createElement(ReactBootstrap.Panel, {
                     header: network.data.name,
+                    className: className,
+                    onClick: onClick
                 }, panelChildren
             )
         );

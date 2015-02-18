@@ -43,20 +43,23 @@ var rootComponent = React.createClass({
                 storage: false,
                 networks: false,
                 clusters: false,
-                vms: false
+                vms: false,
+                events: false
             },
             view: "home",
             data: {
                 details: {
                     datacenterId: null,
                     networkId: null,
-                    clusterId: null
+                    clusterId: null,
+                    vmId: null
                 },
                 datacenters: null,
                 storage: null,
                 networks: null,
                 clusters: null,
                 vms: null,
+                events: null,
                 error: null
             }
         }
@@ -297,6 +300,29 @@ var rootComponent = React.createClass({
         }).catch(this.onError)
     },
 
+    showVmDetail: function(id){
+        var state = this.state;
+        state.data.details.vmId = id;
+        state.view = "vm-detail";
+        this.setState(state);        
+    },
+
+    getVmById: function(id){
+        var vms = this.state.data.vms;
+        if(vms === null){
+            return null;
+        }
+
+        for(var i = 0; i < vms.length; i++){
+            if(vms[i].data.id === id){
+                return vms[i];
+            }
+        }
+
+        return null;
+
+    },
+
     getVms: function(){
         var self = this;
 
@@ -472,10 +498,35 @@ var rootComponent = React.createClass({
                 React.createElement("div", 
                     {className: "container"}, 
                     React.createElement(vmComponent, {
-                        data: this.state.data.vms
+                        data: this.state.data.vms,
+                        onVm: this.showVmDetail
                     })
                 )
             );
+        }
+
+        if(this.state.view === "vm-detail"){
+            var vm = this.getVmById(this.state.data.details.vmId);
+            console.log("got back vm", vm);
+            return React.createElement("div", null,
+                navElement,
+                React.createElement("div",
+                    {className: "container"},
+                    React.createElement(vmDetailComponent, {
+                        vm: vm
+                    })
+                )
+            )
+        }
+
+        if(this.state.view === "events"){
+            return React.createElement("div", null,
+                navElement,
+                React.createElement("div",
+                    {className: "container"},
+                    React.createElement(eventComponent, null)
+                )
+            )
         }
 
         return React.createElement("div", null,

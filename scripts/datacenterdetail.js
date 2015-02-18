@@ -1,5 +1,4 @@
 var datacenterDetailComponent = React.createClass({
-
 	render: function(){
 
         if(!this.props.datacenter){
@@ -7,10 +6,7 @@ var datacenterDetailComponent = React.createClass({
         }
 
 		var datacenter = this.props.datacenter;
-
-
         var self = this;
-
 
 		var datacenterPanelChildren = [
             React.createElement("div", null, "ID: " + datacenter.data.id),

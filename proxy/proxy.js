@@ -27,7 +27,7 @@ ovirtProxy.on('proxyReq', function(proxyReq, req, res, options) {
 var server = http.createServer(function(req, res) {
 	var url = req.url;
 
-	fileServe(req, res, function() {
+	fileServe(req, res, function(err) {
 		console.log('proxying url:', url);
 
 		req.url = url.split('/api')[1]

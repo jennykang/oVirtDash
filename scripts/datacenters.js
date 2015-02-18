@@ -10,7 +10,7 @@ var datacenterComponent = React.createClass({
             React.createElement("div", null, "Status: " + datacenter.data.status.state)
         ];
         
-        if(datacenter.data.description){
+        if(datacenter.data.descriptionre){
             var description = React.createElement("div", null, "Description: " + datacenter.data.description);
             panelChildren.push(description);
         }
@@ -22,25 +22,22 @@ var datacenterComponent = React.createClass({
                 datacenter.data.version.minor
             )
         )
-        if (self.props.onDatacenter) {
-            // make datacenter clickable
-            return React.createElement("div", {className: "col-md-4"},
-                React.createElement(ReactBootstrap.Panel, {
-                        header: datacenter.data.name,
-                        className: "anchor",
-                        onClick: function(){
-                            self.props.onDatacenter(datacenter.data.id)
-                        }
-                    },
-                    panelChildren
-                )
-            );
+        
+        var onClick = null;
+        var className = null;
+        if (self.props.onDatacenter){
+            className = "anchor";
+            onClick = function(){
+                self.props.onDatacenter(datacenter.data.id)
+            };
         }
 
         return React.createElement("div", {className: "col-md-4"},
             React.createElement(ReactBootstrap.Panel, 
                 {
                     header: datacenter.data.name,
+                    className: className,
+                    onClick: onClick
                 },
                 panelChildren
             )

@@ -5,21 +5,21 @@ var vmComponent = React.createClass({
             return React.createElement(waitingComponent, null)
         }
 
+        var onClick = null;
+        var className = null;
         if(self.props.onVm){
-        	return React.createElement("div",{className: "col-md-4"},
-        		React.createElement(ReactBootstrap.Panel,{
-    			    className: "anchor",
-                    onClick: function(){
-                        self.props.onDatacenter(datacenter.data.id)
-                    }
-        		})
-        	)
+        	className = "anchor";
+        	onClick = function(){
+        		self.props.onVm(vm.data.id)
+        	};
         }
 
         return React.createElement("div", {className: "col-md-4"},
         	React.createElement(ReactBootstrap.Panel, {
         		style: {textAlign: "center"},
-        		header: vm.data.name
+        		header: vm.data.name,
+        		className: className,
+        		onClick: onClick
         	}, React.createElement("img", {src: "images/linux-icon.png"}))
         )
 	},
