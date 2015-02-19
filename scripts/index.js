@@ -341,6 +341,24 @@ var rootComponent = React.createClass({
         }).catch(this.onError)
     },
 
+    getEvents: function(){
+        var self = this;
+
+        if(this.state.loading.events){
+            return;
+        }
+        this.state.loading.events = true;
+
+        ovirt.api.events.list().run().then(function(data){
+            if(!data){
+                return this.onError(new Error("did not get data successfully!!"));
+            }
+            self.state.loading.events = false;
+            self.state.data.events = data;
+            self.setState(self.state);
+        }).catch(this.onError)
+    },
+
     changeView: function(view){
         var state = this.state;
         state.view = view;
@@ -385,6 +403,10 @@ var rootComponent = React.createClass({
 
         if(!this.state.data.vms){
             this.getVms();
+        }
+
+        if(!this.state.data.events){
+            this.getEvents();
         }
 
         var waitingElement = React.createElement("div", null,
@@ -524,7 +546,9 @@ var rootComponent = React.createClass({
                 navElement,
                 React.createElement("div",
                     {className: "container"},
-                    React.createElement(eventComponent, null)
+                    React.createElement(eventComponent, {
+                        data: this.state.data.events
+                    })
                 )
             )
         }
