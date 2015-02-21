@@ -18,6 +18,7 @@ var rootComponent = React.createClass({
             self.state.initialized = true;
             self.setState(self.state);
         });
+        
         promise.catch(function(){
             alert("Cannot connect. Going back to sign in page");
 			return;

@@ -9,10 +9,10 @@ var navbarComponent =  React.createClass({
                     },
                     className: "anchor"
                 }),
-                defaultNavExpanded: true,
                 toggleNavKey: 1
             }, 
             React.createElement(ReactBootstrap.Nav, {
+                eventKey: 1,
                 onSelect: function(eventKey){
                     self.props.onView(eventKey);
                 }
@@ -46,20 +46,20 @@ var navbarComponent =  React.createClass({
                 React.createElement(ReactBootstrap.NavItem, {
                     eventKey: "events",
                     href: "#"
-                }, "Events")
-            ),
+                }, "Events"),
 
-            React.createElement("form", {
-                className:"navbar-form pull-right"
-            }, React.createElement("button", {
-                type: "submit",
-                className: "btn btn-success",
-                onClick: function(ev){
-                    window.location = "login.html"
+                React.createElement("form", {
+                    className:"navbar-form pull-right"
+                }, React.createElement("button", {
+                    type: "submit",
+                    className: "btn btn-success",
+                    onClick: function(ev){
+                        window.location = "login.html"
 
-                    ev.preventDefault();
-                }
-            }, "Sign out"))
+                        ev.preventDefault();
+                    }
+                }, "Sign out"))
+            )
         );
     }
 })

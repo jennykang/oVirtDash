@@ -25,7 +25,7 @@ var datacenterComponent = React.createClass({
         
         var onClick = null;
         var className = null;
-        if (self.props.onDatacenter){
+        if(self.props.onDatacenter){
             className = "anchor";
             onClick = function(){
                 self.props.onDatacenter(datacenter.data.id)
