@@ -3,11 +3,7 @@ var homeComponent = React.createClass({
 	render: function(){
 		var self = this;
 
-		return React.createElement("div",
-			{
-				className: "container"
-			},
-
+		return React.createElement("div", null,
 			React.createElement("div", {className: "row"},
 				React.createElement("div", {className: "col-sm-3"},
 					React.createElement(ReactBootstrap.Panel,
