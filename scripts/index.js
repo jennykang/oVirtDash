@@ -18,12 +18,7 @@ var rootComponent = React.createClass({
             self.state.initialized = true;
             self.setState(self.state);
 
-            self.getDatacenters();
-            self.getNetworks();
-            self.getStorage();
-            self.getClusters();
-            self.getVms();
-            self.getEvents();
+            self.refresh();
 
             self.addNotification({description: "connected to oVirt", severity: "success"});
         });
@@ -35,7 +30,72 @@ var rootComponent = React.createClass({
         });
     },
 
+    refresh: function(){
+        ovirt.api.datacenters.list().run().then(this.updateDatacenters).catch(this.onError);
+        ovirt.api.networks.list().run().then(this.updateNetworks).catch(this.onError);
+        ovirt.api.storagedomains.list().run().then(this.updateStorageDomains).catch(this.onError);
+        ovirt.api.clusters.list().run().then(this.updateClusters).catch(this.onError);
+        ovirt.api.vms.list().run().then(this.updateVms).catch(this.onError);
+        ovirt.api.events.list().run().then(this.updateEvents).catch(this.onError);
+    },
+
+    updateDatacenters: function(data){
+        if(!data){
+            return this.onError(new Error("No data given to update datacenters"));
+        }
+
+        this.state.data.datacenters = data;
+        this.setState(this.state);
+    },
+
+    updateNetworks: function(data){
+        if(!data){
+            return this.onError(new Error("No data given to update network"));
+        }
+
+        this.state.data.networks = data;
+        this.setState(this.state);
+    },
+
+    updateStorageDomains: function(data){
+        if(!data){
+            return this.onError(new Error("No data given to update stroage domains"));
+        }
+
+        this.state.data.storage = data;
+        this.setState(this.state);
+    },
+
+    updateClusters: function(data){
+        if(!data){
+            return this.onError(new Error("No data given to update clusters"));
+        }
+
+        this.state.data.clusters = data;
+        this.setState(this.state);
+    },
+
+    updateVms: function(data){
+        if(!data){
+            return this.onError(new Error("No data given to update vms"));
+        }
+
+        this.state.data.vms = data;
+        this.setState(this.state);
+    },
+
+    updateEvents: function(data){
+        if(!data){
+            return this.onError(new Error("No data given to update events"));
+        }
+
+        this.state.data.events = data;
+        this.setState(this.state);
+    },
+
 	onError: function(err) {
+        console.log('got back error: ', err);
+
 		var self = this;
 		var state = self.state;
 		state.data.error = {
@@ -48,14 +108,7 @@ var rootComponent = React.createClass({
     getInitialState: function(){
         return {
             initialized: false,
-            loading: {
-                datacenters: false,
-                storage: false,
-                networks: false,
-                clusters: false,
-                vms: false,
-                events: false
-            },
+            refreshing: false,
             view: "home",
             data: {
                 details: {
@@ -130,48 +183,6 @@ var rootComponent = React.createClass({
         this.setState(state);
     },
 
-    getDatacenters: function(){
-
-        if(this.state.loading.datacenters){
-            return; //datacenters already loading so no need to get data again
-        }
-
-        this.state.loading.datacenters = true;
-        var self = this;
-
-        ovirt.api.datacenters.list().run().then(function(data){
-			if(!data){
-				return this.onError(new Error("did not get data successfully!!"));
-			}
-
-            self.state.loading.datacenters = false;
-            self.state.data.datacenters = data;
-            self.setState(self.state);
-        }).catch(this.onError)
-    },
-
-    getStorage: function(){
-
-        var self = this;
-
-
-        if(this.state.loading.storage){
-            return; //storage already loading so no need to get data again
-        }
-        this.state.loading.storage = true;
-
-        ovirt.api.storagedomains.list().run().then(function(data){
-
-			if(!data){
-				return this.onError(new Error("did not get data successfully!!"));
-			}
-            self.state.loading.storage = false;
-            self.state.data.storage = data;
-            self.setState(self.state);
-        }).catch(this.onError)
-
-    },
-
     getNetworkById: function(id){
         var networks = this.state.data.networks;
         if (networks == null) {
@@ -203,8 +214,6 @@ var rootComponent = React.createClass({
         }).catch(this.onError)
     },
 
-
-
     showNetworkDetails: function(id){
         var state = this.state;
 
@@ -216,26 +225,6 @@ var rootComponent = React.createClass({
         this.setState(state);
     },
 
-    getNetworks: function(){
-        var self = this;
-
-
-        if(this.state.loading.networks){
-            return; //networks already loading so no need to get data again
-        }
-        this.state.loading.networks = true;
-
-
-        ovirt.api.networks.list().run().then(function(data){
-
-			if(!data){
-				return this.onError(new Error("did not get data successfully!!"));
-			}
-            self.state.loading.networks = false;
-            self.state.data.networks = data;
-            self.setState(self.state);
-        }).catch(this.onError)
-    },
 
     getClusterById: function(id){
         var clusters = this.state.data.clusters;
@@ -293,24 +282,6 @@ var rootComponent = React.createClass({
         this.setState(state);
     },
 
-    getClusters: function(){
-        var self = this;
-
-        if(this.state.loading.clusters){
-            return; //clusters already loading so no need to get data again
-        }
-        this.state.loading.clusters = true;
-
-        ovirt.api.clusters.list().run().then(function(data){
-			if(!data){
-				return this.onError(new Error("did not get data successfully!!"));
-			}
-            self.state.loading.clusters = false;
-            self.state.data.clusters = data;
-            self.setState(self.state);
-        }).catch(this.onError)
-    },
-
     showVmDetail: function(id){
         var state = this.state;
         state.data.details.vmId = id;
@@ -332,42 +303,6 @@ var rootComponent = React.createClass({
 
         return null;
 
-    },
-
-    getVms: function(){
-        var self = this;
-
-        if(this.state.loading.vms){
-            return;
-        }
-        this.state.loading.vms = true;
-
-        ovirt.api.vms.list().run().then(function(data){
-            if(!data){
-                return this.onError(new Error("did not get data successfully!!"));
-            }
-            self.state.loading.vms = false;
-            self.state.data.vms = data;
-            self.setState(self.state);
-        }).catch(this.onError)
-    },
-
-    getEvents: function(){
-        var self = this;
-
-        if(this.state.loading.events){
-            return;
-        }
-        this.state.loading.events = true;
-
-        ovirt.api.events.list().run().then(function(data){
-            if(!data){
-                return this.onError(new Error("did not get data successfully!!"));
-            }
-            self.state.loading.events = false;
-            self.state.data.events = data;
-            self.setState(self.state);
-        }).catch(this.onError)
     },
 
     addNotification: function(notification){

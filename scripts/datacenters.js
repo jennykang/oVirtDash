@@ -32,7 +32,7 @@ var datacenterComponent = React.createClass({
             };
         }
 
-        return React.createElement("div", {className: "col-md-4"},
+        return React.createElement("div", {className:"col-md-4", key:datacenter.data.id},
             React.createElement(ReactBootstrap.Panel, 
                 {
                     header: datacenter.data.name,
