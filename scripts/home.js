@@ -73,6 +73,20 @@ var homeComponent = React.createClass({
 						React.createElement("img", {src: "images/vm-icon.png"}),
 						React.createElement("h3", null, "VMs")
 					)
+				),
+
+				React.createElement("div", {className: "col-sm-3"},
+					React.createElement(ReactBootstrap.Panel,
+					{
+						style: {textAlign: "center"},
+						onClick: function(){
+							self.props.onView("events")
+						},
+						className: "anchor"
+					},
+					React.createElement("img", {src: "images/events-icon.png"}),
+					React.createElement("h3", null, "Events")
+					)
 				)
 			)
 		)

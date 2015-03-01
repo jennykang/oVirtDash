@@ -11,16 +11,49 @@ ovirt.api.options.engineBaseUrl = "http://" + encodeURIComponent(username) + ':'
 
 var rootComponent = React.createClass({
     componentDidMount: function(){
-
         var self = this;
         var promise = ovirt.api.init();
         promise.then(function(){
             self.state.initialized = true;
             self.setState(self.state);
 
-            self.refresh();
+            function tick(){
 
-            self.addNotification({description: "connected to oVirt", severity: "success"});
+                ovirt.api.events.list().run().then(function(events){
+                    console.log("updating events")
+                    var edata = self.state.data.events;
+                    if(!edata){
+                        self.updateEvents(events);
+                        setTimeout(tick, 10000);
+                        return;
+                    }
+
+                    else if(events.length !== edata.length){
+                        self.updateEvents(events);
+                        for(var i = events.length - 1; i >= edata.length; i--){
+                            self.addNotification({description: events[i].data.description});
+                        }
+
+                        self.refresh().then(function(){
+                            setTimeout(tick, 5000);
+                            console.log("refreshing")
+                        });
+                    }
+
+                    else{
+                        self.updateEvents(events);
+                        setTimeout(tick, 5000);
+                    }
+                }).catch(self.onError);  
+            };
+
+
+            self.refresh().then(function() {
+                self.addNotification({description: "connected to oVirt", severity: "success"});
+
+                tick();
+            })
+
         });
 
         promise.catch(function(){
@@ -31,12 +64,19 @@ var rootComponent = React.createClass({
     },
 
     refresh: function(){
-        ovirt.api.datacenters.list().run().then(this.updateDatacenters).catch(this.onError);
-        ovirt.api.networks.list().run().then(this.updateNetworks).catch(this.onError);
-        ovirt.api.storagedomains.list().run().then(this.updateStorageDomains).catch(this.onError);
-        ovirt.api.clusters.list().run().then(this.updateClusters).catch(this.onError);
-        ovirt.api.vms.list().run().then(this.updateVms).catch(this.onError);
-        ovirt.api.events.list().run().then(this.updateEvents).catch(this.onError);
+        var self = this;
+
+        return Promise.all([
+            ovirt.api.datacenters.list().run().then(this.updateDatacenters),
+            ovirt.api.networks.list().run().then(this.updateNetworks),
+            ovirt.api.storagedomains.list().run().then(this.updateStorageDomains),
+            ovirt.api.clusters.list().run().then(this.updateClusters),
+            ovirt.api.vms.list().run().then(this.updateVms),
+            ovirt.api.events.list().run().then(this.updateEvents)
+        ]).then(function(data){
+            self.addNotification({description: "refreshed", severity: "success"});
+        }).catch(this.onError)
+
     },
 
     updateDatacenters: function(data){
@@ -95,6 +135,9 @@ var rootComponent = React.createClass({
 
 	onError: function(err) {
         console.log('got back error: ', err);
+        if(err.stack){
+            console.log(err.stack)
+        }
 
 		var self = this;
 		var state = self.state;

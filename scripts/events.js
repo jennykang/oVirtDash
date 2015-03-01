@@ -32,7 +32,7 @@ var eventComponent = React.createClass({
 		}
 
 		var rows = [];
-		for(var i = 0; i < this.props.data.length; i++){
+		for(var i = this.props.data.length-1; i >= 0; i--){
 			rows.push(this.getEventRow(this.props.data[i]));
 		}
 
