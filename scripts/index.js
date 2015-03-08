@@ -44,7 +44,7 @@ var rootComponent = React.createClass({
                         self.updateEvents(events);
                         setTimeout(tick, 5000);
                     }
-                }).catch(self.onError);  
+                }).catch(self.onError);
             };
 
 
@@ -56,10 +56,11 @@ var rootComponent = React.createClass({
 
         });
 
-        promise.catch(function(){
+        promise.catch(function(ex){
             alert("Cannot connect. Going back to sign in page");
-			return;
+			console.log('got back error connecting to ovirt:', ex, ex.message);
             window.location = "login.html";
+			return;
         });
     },
 
@@ -329,7 +330,7 @@ var rootComponent = React.createClass({
         var state = this.state;
         state.data.details.vmId = id;
         state.view = "vm-detail";
-        this.setState(state);        
+        this.setState(state);
     },
 
     getVmById: function(id){
@@ -417,7 +418,7 @@ var rootComponent = React.createClass({
                     notificationElement,
                     React.createElement(homeComponent, {onView: this.changeView})
                 )
-               
+
             );
         }
 
@@ -515,7 +516,7 @@ var rootComponent = React.createClass({
         if(this.state.view === "vms"){
             return React.createElement("div", null,
                 navElement,
-                React.createElement("div", {className: "container"}, 
+                React.createElement("div", {className: "container"},
                     notificationElement,
                     React.createElement(vmComponent, {
                         data: this.state.data.vms,

@@ -21,8 +21,6 @@ $(document).ready(function(){
 		var password = $("#inputPassword").val();
 		var enginehost = $("#inputEngine").val();
 
-
-
 		if(username.length === 0){
 			$(".alert-danger").removeClass("collapse");
 			$(".errorText").text("Please input valid username");
@@ -42,7 +40,7 @@ $(document).ready(function(){
 		}
 
 
-		var apiurl = "http://" + enginehost + "/ovirt-engine/api";
+		var apiurl = "http://" + /* username + ":" + password + "@" +*/ enginehost + "/ovirt-engine/api";
 
 		jQuery.support.cors = true;
 		function make_base_auth(user, password) {
