@@ -1,4 +1,4 @@
-var networksComponent = React.createClass({
+var networkComponent = React.createClass({
     getNetworkPanel: function(network){
         var self = this;
         if(!this.props.data){
@@ -20,29 +20,62 @@ var networksComponent = React.createClass({
             React.createElement("div", null, "Usage: " + usage)
         ];
 
-        return React.createElement(ReactBootstrap.Panel, {
-                header: network.data.name,
-                //className: "anchor",
-                onClick: function(){
-                    //self.props.onNetwork(network.data.id)
-                }
-            }, panelChildren
+        if(self.props.onNetwork){
+            return React.createElement("div", {className: "col-md-4"},
+                React.createElement(ReactBootstrap.Panel, {
+                        header: network.data.name,
+                        className: "anchor",
+                        onClick: function(){
+                            self.props.onNetwork(network.data.id)
+                        }
+                    }, panelChildren
+                )
+            );
+        }
+
+        var onClick = null;
+        var className = null;
+        
+        if(self.props.onNetwork){
+            className = "anchor";
+            onClick = function(){
+                self.props.onNetwork(network.data.id)
+            };
+        }
+
+        return React.createElement("div", {className: "col-md-4"},
+            React.createElement(ReactBootstrap.Panel, {
+                    header: network.data.name,
+                    className: className,
+                    onClick: onClick
+                }, panelChildren
+            )
         );
     },
 
     render: function(){
-        var panelElems = [];
         if(!this.props.data){
             return React.createElement(waitingComponent, null);
         }
+        rowElems = [];
+        tempElems = [];
 
         for(var i = 0; i < this.props.data.length; i++){
-            panelElems.push(this.getNetworkPanel(this.props.data[i]));
+            if(tempElems.length === 3){
+                rowElems.push(React.createElement("div", {className: "row"}, tempElems));
+                tempElems = [];
+            }
+            tempElems.push(this.getNetworkPanel(this.props.data[i]));
+        }
+
+        if(tempElems.length){
+            rowElems.push(React.createElement("div", {className: "row"}, tempElems));
+            tempElems = [];
         }
 
         return React.createElement("div", null, 
             React.createElement("h1", null, "Networks"), 
-            panelElems
+            rowElems
         );
     }
 })

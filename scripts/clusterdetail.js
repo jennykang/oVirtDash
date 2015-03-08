@@ -8,15 +8,15 @@ var clusterDetailComponent = React.createClass({
         
         if(cluster.data.description){
             var description = React.createElement("div", null, "Description: " + cluster.data.description);
-            panelChildren.push(description);
+            clusterPanelChildren.push(description);
         }
 
         if(cluster.data.cpu){
             var cpu = React.createElement("div", null, "CPU Type: " + cluster.data.cpu.id);
-            panelChildren.push(cpu);
+            clusterPanelChildren.push(cpu);
         }
 
-        panelChildren.push(
+        clusterPanelChildren.push(
             React.createElement("div", null, 
                 "Compatibility Version: " + 
                 cluster.data.version.major + "." + 
@@ -26,12 +26,16 @@ var clusterDetailComponent = React.createClass({
         
         return React.createElement("div", null,
         	React.createElement("h1", null, "Cluster"),
-  		    React.createElement(ReactBootstrap.Panel, 
-  		    	{
-                	header: cluster.data.name 
-            	},
-           		clusterPanelChildren
-        	),
+            React.createElement("div", {className: "row"},
+                React.createElement("div", {className: "col-md-4"},
+                    React.createElement(ReactBootstrap.Panel, 
+                        {
+                            header: cluster.data.name 
+                        },
+                        clusterPanelChildren
+                    )
+                )
+             ),
        		React.createElement(datacenterComponent, {
             	data: cluster.data.datacenters
         	}),        	

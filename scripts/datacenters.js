@@ -1,5 +1,5 @@
 var datacenterComponent = React.createClass({
-    getDatacenterPanel: function(datacenter) {
+    getDatacenterPanel: function(datacenter){
         var self = this;
         if(!this.props.data){
             return React.createElement(waitingComponet, null)
@@ -10,7 +10,7 @@ var datacenterComponent = React.createClass({
             React.createElement("div", null, "Status: " + datacenter.data.status.state)
         ];
         
-        if(datacenter.data.description){
+        if(datacenter.data.descriptionre){
             var description = React.createElement("div", null, "Description: " + datacenter.data.description);
             panelChildren.push(description);
         }
@@ -22,29 +22,53 @@ var datacenterComponent = React.createClass({
                 datacenter.data.version.minor
             )
         )
+        
+        var onClick = null;
+        var className = null;
+        if(self.props.onDatacenter){
+            className = "anchor";
+            onClick = function(){
+                self.props.onDatacenter(datacenter.data.id)
+            };
+        }
 
-        return React.createElement(ReactBootstrap.Panel, {
-                header: datacenter.data.name,
-                className: "anchor",
-                onClick: function(){
-                    self.props.onDatacenter(datacenter.data.id)
-                }
-            },
-            panelChildren
+        return React.createElement("div", {className:"col-md-4", key:datacenter.data.id},
+            React.createElement(ReactBootstrap.Panel, 
+                {
+                    header: datacenter.data.name,
+                    className: className,
+                    onClick: onClick
+                },
+                panelChildren
+            )
         );
     },
     
     render: function() {
-        var panelElems = [];
 
+        var self = this;
+        if(!this.props.data){
+            return React.createElement(waitingComponent, null);
+        }
+
+        var rowElems = [];
+        var tempElems = [];
 
         for(var i = 0; i < this.props.data.length; i++){
-            panelElems.push(this.getDatacenterPanel(this.props.data[i]));
+            if(tempElems.length === 3){
+                rowElems.push(React.createElement("div", {className: "row"}, tempElems));
+                tempElems = [];
+            }
+            tempElems.push(this.getDatacenterPanel(this.props.data[i]));
+        }
+        if(tempElems.length){
+            rowElems.push(React.createElement("div", {className: "row"}, tempElems));
+            tempElems = [];
         }
 
         return React.createElement("div", null, 
-            React.createElement("h1", null, "Available Datacenters"), 
-            panelElems
+            React.createElement("h1", null, "Datacenters"), 
+            rowElems
         );
     }
 })

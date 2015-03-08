@@ -21,28 +21,40 @@ var storageComponent = React.createClass({
             panelChildren.push(availableSpace);
         }
 
-        return React.createElement(ReactBootstrap.Panel, {
-                header: storage.data.name,
-                //className: "anchor",
-                onClick: function(){
-                    //self.props.onStorage(storage.data.id)
-                }
-            },
-            panelChildren
-        );
+        return React.createElement("div", {className: "col-md-4"},
+            React.createElement(ReactBootstrap.Panel, {
+                    header: storage.data.name,
+                    //className: "anchor",
+                    onClick: function(){
+                        //self.props.onStorage(storage.data.id)
+                    }
+                },
+                panelChildren
+            )
+        )
     },
 
     render: function(){
-        var panelElems = [];
+        var rowElems = [];
+        var tempElems = [];
 
 
         for(var i = 0; i < this.props.data.length; i++){
-            panelElems.push(this.getStoragePanel(this.props.data[i]));
+            if(tempElems.length === 3){
+                rowElems.push(React.createElement("div", {className: "row"}, tempElems));
+                tempElems = [];
+            }
+            tempElems.push(this.getStoragePanel(this.props.data[i]));
+        }
+
+        if(tempElems.length){
+            rowElems.push(React.createElement("div", {className: "row"}, tempElems));
+            tempElems = [];
         }
 
         return React.createElement("div", null, 
             React.createElement("h1", null, "Storage domains"), 
-            panelElems
+            rowElems
         );
     }
 })

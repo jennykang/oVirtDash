@@ -3,31 +3,20 @@ var navbarComponent =  React.createClass({
         var self = this;
         return React.createElement(ReactBootstrap.Navbar, {
                 brand: React.createElement("img", {
-                    src: "images/ovirt.png"
+                    src: "images/ovirt.png",
+                    onClick: function(){
+                        self.props.onView("home");
+                    },
+                    className: "anchor"
                 }),
-                defaultNavExpanded: true,
-                toggleButton: [
-                    React.createElement("span", {
-                        className: "sr-only"
-                    }, "Toggle Navigation"),
-                    React.createElement("span", {
-                        className: "icon-bar"
-                    }),
-                    React.createElement("span", {
-                        className: "icon-bar"
-                    })
-                ]
+                toggleNavKey: 1
             }, 
             React.createElement(ReactBootstrap.Nav, {
+                eventKey: 1,
                 onSelect: function(eventKey){
                     self.props.onView(eventKey);
                 }
             },
-
-                React.createElement(ReactBootstrap.NavItem, {
-                    eventKey:"statistics",
-                    href: "#"
-                }, "Statistics"),
 
                 React.createElement(ReactBootstrap.NavItem, {
                     eventKey: "datacenters",
@@ -47,20 +36,30 @@ var navbarComponent =  React.createClass({
                 React.createElement(ReactBootstrap.NavItem, {
                     eventKey: "clusters",
                     href: "#"
-                }, "Clusters")
-            ),
+                }, "Clusters"),
 
-            React.createElement("form", {
-                className:"navbar-form pull-right"
-            }, React.createElement("button", {
-                type: "submit",
-                className: "btn btn-success",
-                onClick: function(ev){
-                    window.location = "login.html"
+                React.createElement(ReactBootstrap.NavItem, {
+                    eventKey: "vms",
+                    href: "#"
+                }, "VMs"),
 
-                    ev.preventDefault();
-                }
-            }, "Sign out"))
+                React.createElement(ReactBootstrap.NavItem, {
+                    eventKey: "events",
+                    href: "#"
+                }, "Events"),
+
+                React.createElement("form", {
+                    className:"navbar-form pull-right"
+                }, React.createElement("button", {
+                    type: "submit",
+                    className: "btn btn-success",
+                    onClick: function(ev){
+                        window.location = "login.html"
+
+                        ev.preventDefault();
+                    }
+                }, "Sign out"))
+            )
         );
     }
 })

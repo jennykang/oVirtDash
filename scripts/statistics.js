@@ -29,6 +29,10 @@ var parseStatistics = function(xml) {
 
 var statisticsComponent = React.createClass({
     render: function (){
+        if (!this.props.data){
+            return React.createElement(waitingComponent, null);
+        }
+
         return React.createElement("div", null,
             React.createElement("h1", null, "Statistics"), 
             React.createElement(ReactBootstrap.Panel, {

@@ -8,7 +8,7 @@ $(document).ready(function(){
 
 	if(docCookies.hasItem("password")){
 		$("#inputPassword").val(docCookies.getItem("password"));
-	} 
+	}
 
 	if(docCookies.hasItem("enginehost")){
 		$("#inputEngine").val(docCookies.getItem("enginehost"));
@@ -20,8 +20,6 @@ $(document).ready(function(){
 		var username = $("#inputUsername").val();
 		var password = $("#inputPassword").val();
 		var enginehost = $("#inputEngine").val();
-
-
 
 		if(username.length === 0){
 			$(".alert-danger").removeClass("collapse");
@@ -42,13 +40,23 @@ $(document).ready(function(){
 		}
 
 
-		var apiurl = "http://" + enginehost + "/ovirt-engine/api";
+		var apiurl = "http://" + /* username + ":" + password + "@" +*/ enginehost + "/ovirt-engine/api";
+
+		jQuery.support.cors = true;
+		function make_base_auth(user, password) {
+			var tok = user + ':' + password;
+			var hash = btoa(tok);
+
+			return "Basic " + hash;
+		}
+
 		$.ajax({
 			url: apiurl,
 			type: "GET",
 			dataType: "xml",
-			username: username,
-			password: password,
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader("Authorization", make_base_auth(username, password));
+			},
 
 			success: function(data){
 				$(".alert-success").removeClass("collapse");
